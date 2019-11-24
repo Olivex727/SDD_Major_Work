@@ -1,0 +1,20 @@
+{
+  "name": "sdd_major_work",
+  "version": "1.0.0",
+  "description": "My Year 12 Major Work",
+  "main": "main.js",
+  "scripts": {
+    "test": "console.log(\"Start\")",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Olivex727/SDD_Major_Work.git"
+  },
+  "author": "Oliver Walters",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Olivex727/SDD_Major_Work/issues"
+  },
+  "homepage": "https://github.com/Olivex727/SDD_Major_Work#readme"
+}
