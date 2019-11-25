@@ -11,26 +11,78 @@
  * 
  */
 
+ //Formula - MM
+ let chemichaldict = {
+     "Na": 22.99,
+     "Cl": 35.45,
+     "N" : 14.01,
+     "O" : 16
+ }
+
 class chemical {
     constructor(formula, name, type, ion=0) {
         this.formula = formula; this.name = name, this.type = type; this.ion = ion;
     }
 
-    //Search for the element's tempurature-based attributes
+    //Search for the chemicals's tempurature-based attributes
     getDriver(driver) {
         //Get Melting point (m), Boiling point (b), Temurature (t), Enthalpy (h), Entropy (s)
     }
 
-    //Get the molar mass of the element
+    //Get the molar mass of the chemical
     getMolarMass() {
-
+        let MM = 0;
+        let farr = this.getFormulaArray();
+        for (let chem in farr) {
+            //console.log(chemichaldict[farr[chem][0]]);
+            MM += (chemichaldict[farr[chem][0]] * farr[chem][1]);
+        }
+        return MM;
     }
 
     //Seperate fromula into array of the elements and their amounts
     getFormulaArray() {
         //Split formula into array
+        let farr = this.formula.split("");
+
         //Form elements by adding to strings starting with capitals
+        let returnformula = [];
+        let templist = [];
+        let number = 1;
+        let checknumflag = false;
+
+        for (let c in farr){
+            let char = farr[c];
+            //console.log(char);
+            if (char == char.toUpperCase() && isNaN(char) && c != 0) {
+                if (!checknumflag) {
+                    number = 1;
+                }
+                returnformula.push([templist.join(""), number]);
+                templist = [];
+                number = 1;
+                templist.push(char);
+                //console.log("Upper");
+            }
+            else if (!isNaN(char)) {
+                number = parseInt(char);
+                checknumflag = true;
+                //console.log("Num");
+            }
+            else {
+                templist.push(char);
+                //console.log("Else");
+            }
+        }
+
+        //Rerun algorithim for the end of the string/list
+        if (!checknumflag) {
+            number = 1;
+        }
+        returnformula.push([templist.join(""), number]);
+
         //All number entries go to seperate arrays
+        return returnformula;
     }
 }
 

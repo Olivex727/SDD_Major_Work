@@ -35,6 +35,6 @@ app.get('/css', function (req, res) {
 });
 
 //Host to port 8000
-app.listen(3000, function () {
+app.listen(8000, function () {
     console.log('listening on port 8000');
 });
