@@ -5,7 +5,7 @@ Here is my Software Major Project
 
 # Version No.
 
-Current Version - 0.0.2
+Current Version - 0.0.3
 
 # Major developments
 
