@@ -34,6 +34,10 @@ app.get('/css', function (req, res) {
     res.sendfile("webpage/style.css");
 });
 
+app.get('/file', function (req, res) {
+    res.sendfile('public/files/'+req.query.name + '.txt');
+})
+
 //Host to port 8000
 app.listen(8000, function () {
     console.log('listening on port 8000');

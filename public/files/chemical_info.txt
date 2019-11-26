@@ -1,0 +1,1 @@
+formula|state|∆H|∆S|MP|BP|∆Vr

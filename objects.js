@@ -11,14 +11,10 @@
  * 
  */
 
- //Formula - MM
- let chemichaldict = {
-     "Na": 22.99,
-     "Cl": 35.45,
-     "N" : 14.01,
-     "O" : 16
- }
+//Formula - MM
+let chemicaldict = {}
 
+//The chemical class stores information on the individial chemical identities
 class chemical {
     constructor(formula, name, type, ion=0) {
         this.formula = formula; this.name = name, this.type = type; this.ion = ion;
@@ -35,7 +31,7 @@ class chemical {
         let farr = this.getFormulaArray();
         for (let chem in farr) {
             //console.log(chemichaldict[farr[chem][0]]);
-            MM += (chemichaldict[farr[chem][0]] * farr[chem][1]);
+            MM += (chemicaldict[farr[chem][0]] * farr[chem][1]);
         }
         return MM;
     }
@@ -86,6 +82,7 @@ class chemical {
     }
 }
 
+//Formula class is where all of the main reaction stuff is handled
 class formula {
     constructor(id, eq, reactants=[], conditions=[]) {
         this.id = id;
