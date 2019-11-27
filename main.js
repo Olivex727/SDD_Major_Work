@@ -19,6 +19,24 @@ for (let e in pt) {
 console.log(chemicaldict);
 console.log(chemicaldict["Zn"]);
 
+//Upload element driver information
+//formula|state|∆H|∆S|MP|BP|∆Vr
+pt = getFiles("chemical_info");
+for (let e in pt) {
+    if (e == 0) { continue; }
+    let elm = pt[e].split("|");
+    driverdict[elm[0]] = {
+        state : elm[1],
+        enthalpy : parseFloat(elm[2]),
+        entropy: parseFloat(elm[3]),
+        mp: parseFloat(elm[4]),
+        bp: parseFloat(elm[5]),
+        red_pot: parseFloat(elm[6])
+    };
+}
+console.log(driverdict);
+console.log(driverdict["NaCl"].bp);
+
 window.onload = function () {
     
 }
@@ -27,9 +45,16 @@ window.onload = function () {
 salt1 = new chemical("NaCl", "Soduim Chloride", "salt", 0);
 ion1 = new chemical("NO3", "Nitrate ion", "ion", -1);
 ion2 = new chemical("PO4", "Nitrate ion", "ion", -3);
+inmol1 = new chemical("H2O", "Water", "inorganic molecule", 0);
 
 console.log(salt1.getFormulaArray());
 console.log(ion2.getFormulaArray());
 
 console.log(salt1.getMolarMass());
 console.log(ion2.getMolarMass());
+
+console.log(salt1.getDriver("enthalpy"));
+
+eq1 = new formula(false, [salt1, inmol1]);
+
+console.log(eq1.getId());

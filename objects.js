@@ -12,7 +12,8 @@
  */
 
 //Formula - MM
-let chemicaldict = {}
+let chemicaldict = {};
+let driverdict = {};
 
 //The chemical class stores information on the individial chemical identities
 class chemical {
@@ -23,6 +24,7 @@ class chemical {
     //Search for the chemicals's tempurature-based attributes
     getDriver(driver) {
         //Get Melting point (m), Boiling point (b), Temurature (t), Enthalpy (h), Entropy (s)
+        return driverdict[this.formula][driver];
     }
 
     //Get the molar mass of the chemical
@@ -46,11 +48,24 @@ class chemical {
         let templist = [];
         let number = 1;
         let checknumflag = false;
+        let checkbracket = false;
+        let checkclosebracket = false;
+        let bracketindex = 0;
 
         for (let c in farr){
             let char = farr[c];
             //console.log(char);
-            if (char == char.toUpperCase() && isNaN(char) && c != 0) {
+            //STILL IN WORKING
+            if (char == "(") {
+                checkbracket = true;
+                bracketindex = c+1;
+            }
+            else if (char == ")") {
+                checkbracket = false;
+                checkclosebracket = true;
+            }
+            //
+            else if (char == char.toUpperCase() && isNaN(char) && c != 0) {
                 if (!checknumflag) {
                     number = 1;
                 }
@@ -84,14 +99,13 @@ class chemical {
 
 //Formula class is where all of the main reaction stuff is handled
 class formula {
-    constructor(id, eq, reactants=[], conditions=[]) {
-        this.id = id;
+    constructor(eq, reactants=[], conditions=[]) {
         this.reactants = reactants; //Array of 3-size arrays [chemichal, Amount, Units]
         this.conditions = conditions;
         this.isDynamic = eq; //Static or Dynamic
 
         this.products = [];
-        this.equilibrum = getEq();
+        this.equilibrum = this.getEq();
     }
 
     //The main reaction producuer
@@ -135,5 +149,14 @@ class formula {
     //Get the Equilibrium constant for the reaction
     getEq() {
         return 0;
+    }
+
+    getId() {
+        let id = "";
+        for (let chem in this.reactants) {
+            id += this.reactants[chem].formula;
+            if (chem != this.reactants.length-1) { id += "+"; }
+        }
+        return id;
     }
 }
