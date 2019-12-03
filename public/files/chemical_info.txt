@@ -1,0 +1,2 @@
+formula|state|∆H|∆S|MP|BP|∆Vr
+NaCl|aq|-411.12|72|1073.8|1738|0
