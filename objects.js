@@ -14,6 +14,7 @@
 //Formula - MM
 let chemicaldict = {};
 let driverdict = {};
+let reactdict = {};
 
 //The chemical class stores information on the individial chemical identities
 class chemical {
@@ -143,6 +144,7 @@ class formula {
         */
 
         let type = this.getReactionType();
+        console.log(type);
         this.formulateProducts(type);
         this.equalize();
         this.calculate();
@@ -150,34 +152,77 @@ class formula {
 
     //Formulate the products based on the reaction type
     formulateProducts(type) {
-
+        //
     }
 
     //Equalise both sides of the reaction
     equalize() {
-
+        //
     }
 
     //Determine the reaction type
     getReactionType() {
-        return "none";
+        console.log(reactdict)
+        let type = [];
+        for (let r in reactdict) {
+            if (reactdict[r].base == "name") {
+                let rsplit = r.split("+");
+                let checkreact = true;
+                for (let c in rsplit) {
+                    if (!this.getId(false).includes(rsplit[c])) {
+                        checkreact = false;
+                    }
+                }
+                if (checkreact) {
+                    type.push(reactdict[r].name);
+                }
+            }
+            else if (reactdict[r].base == "formula") {
+                let rsplit = r.split("+");
+                let checkreact = true;
+                for (let c in rsplit) {
+                    if (!this.getId(true).includes(rsplit[c])) {
+                        checkreact = false;
+                    }
+                }
+                if (checkreact && reactdict[r].std) {
+                    type.push(r);
+                }
+            }
+        }
+        if (type == []) { type.push("none"); }
+        return type;
     }
 
     //Perform calculations on the reaction
     calculate() {
-
+        //
     }
 
     //Get the Equilibrium constant for the reaction
     getEq() {
-        return 0;
+        let eq = 0;
+        for (let r in reactdict) {
+            if (reactdict[r].base == "formula" && reactdict[r].name == this.getReactionType()) {
+                eq = reactdict[r].eq;
+            }
+        }
+        return eq;
     }
 
-    getId() {
+    getId(formula) {
         let id = "";
-        for (let chem in this.reactants) {
-            id += this.reactants[chem].formula;
-            if (chem != this.reactants.length-1) { id += "+"; }
+        if (formula){
+            for (let chem in this.reactants) {
+                id += this.reactants[chem].formula;
+                if (chem != this.reactants.length-1) { id += "+"; }
+            }
+        }
+        else {
+            for (let chem in this.reactants) {
+                id += this.reactants[chem].type;
+                if (chem != this.reactants.length - 1) { id += "+"; }
+            }
         }
         return id;
     }
