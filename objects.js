@@ -48,41 +48,56 @@ class chemical {
         let templist = [];
         let number = 1;
         let checknumflag = false;
-        let checkbracket = false;
         let checkclosebracket = false;
         let bracketindex = 0;
 
+        //Produce the formula array
         for (let c in farr){
             let char = farr[c];
-            //console.log(char);
-            //STILL IN WORKING
             if (char == "(") {
-                checkbracket = true;
-                bracketindex = c+1;
+                bracketindex = returnformula.length + 1;
             }
-            else if (char == ")") {
-                checkbracket = false;
-                checkclosebracket = true;
-            }
-            //
             else if (char == char.toUpperCase() && isNaN(char) && c != 0) {
+                if (char == ")") {
+                    checkclosebracket = true;
+                }
                 if (!checknumflag) {
                     number = 1;
                 }
-                returnformula.push([templist.join(""), number]);
+
+                //Check if it exists
+                let existflag = false;
+                let indexform = 0;
+                for (let i in returnformula) {
+                    if (templist.join("") == returnformula[i][0]) {
+                        existflag = true;
+                        indexform = i;
+                    }
+                }
+                if (!existflag) {
+                    returnformula.push([templist.join(""), number]);
+                }
+                else {
+                    returnformula[indexform][1] += number;
+                }
                 templist = [];
                 number = 1;
                 templist.push(char);
-                //console.log("Upper");
             }
-            else if (!isNaN(char)) {
+            else if (!isNaN(char) && checkclosebracket) {
+                checkclosebracket = false;
+                number = parseInt(char);
+                for (let i = bracketindex; i < returnformula.length; i++) {
+                    returnformula[i][1] *= number;
+                }
+                number = 1;
+            }
+            else if (!isNaN(char) && !checkclosebracket) {
                 number = parseInt(char);
                 checknumflag = true;
-                //console.log("Num");
             }
             else {
                 templist.push(char);
-                //console.log("Else");
             }
         }
 
@@ -91,6 +106,13 @@ class chemical {
             number = 1;
         }
         returnformula.push([templist.join(""), number]);
+
+        //Remove any excess charachters
+        for (let i in returnformula) {
+            if (returnformula[i][0] === ")" || returnformula[i][0] === "") {
+                returnformula.splice(i, 1);
+            }
+        }
 
         //All number entries go to seperate arrays
         return returnformula;

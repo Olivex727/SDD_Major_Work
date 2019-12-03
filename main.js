@@ -42,18 +42,20 @@ window.onload = function () {
 }
 
 //Note: Elements will only go as far as Uranium (No. 92) due to radioactivity and inability to properly bond
-salt1 = new chemical("NaCl", "Soduim Chloride", "salt", 0);
+salt1 = new chemical("(NH4)2NO3", "Ammonium Sulfate", "salt", 0);
+salt2 = new chemical("Ca(NO3)2", "Calcium Nitrate", "salt", 0);
 ion1 = new chemical("NO3", "Nitrate ion", "ion", -1);
 ion2 = new chemical("PO4", "Nitrate ion", "ion", -3);
 inmol1 = new chemical("H2O", "Water", "inorganic molecule", 0);
 
+console.log(salt2.getFormulaArray());
 console.log(salt1.getFormulaArray());
 console.log(ion2.getFormulaArray());
 
 console.log(salt1.getMolarMass());
 console.log(ion2.getMolarMass());
 
-console.log(salt1.getDriver("enthalpy"));
+//console.log(salt1.getDriver("enthalpy"));
 
 eq1 = new formula(false, [salt1, inmol1]);
 
