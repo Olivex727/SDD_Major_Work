@@ -122,12 +122,12 @@ class chemical {
 
 //Formula class is where all of the main reaction stuff is handled
 class formula {
-    constructor(eq, reactants=[], conditions=[]) {
-        this.reactants = reactants; //Array of 3-size arrays [chemichal, Amount, Units]
+    constructor(eq, reactants=[[], [], [], []], conditions=[]) {
+        this.reactants = reactants; //Array of 3-size arrays [chemichal, Ratio, Amount, Units]
         this.conditions = conditions;
         this.isDynamic = eq; //Static or Dynamic
 
-        this.products = [];
+        this.products = [[], [], [], []];
         this.equilibrum = this.getEq();
     }
 
@@ -142,7 +142,7 @@ class formula {
          * 4. Perform calculationsto find final chemichal amounts and the driver details
          * 
         */
-
+       console.log(reactdict);
         let type = this.getReactionType();
         console.log(type);
         this.formulateProducts(type);
@@ -152,20 +152,58 @@ class formula {
 
     //Formulate the products based on the reaction type
     formulateProducts(type) {
-        //
+        if (!type.includes("none")) {
+            for (let i in type) {
+                let item = type[i];
+                for (let r in reactdict) {
+                    if (reactdict[r].name === item) {
+                        console.log(item);
+                        //Once a formula is found, it will not matter if it's special or standard
+                        type.splice(type.indexOf(item), 1)
+                        if (!reactdict[r].std) {
+                            for (let chem in reactdict[r].products.split("+")) {
+                                this.products[0].push(new chemical(reactdict[r].products.split("+")[chem]));
+                                this.products[1].push(1);
+                                this.products[2].push(0);
+                                this.products[3].push("mol");
+                            }
+                            console.log(this.products);
+                        }
+                        else {
+                            //Implement standardized system
+                        }
+                    }
+                }
+            }
+        } else {
+            this.products = this.reactants;
+        }
     }
 
     //Equalise both sides of the reaction
     equalize() {
-        //
+        /*
+        * ALGORITIM:
+        * 1. Get the amount of elements on both sides
+        * 2. For Each element
+        * a. Determine which side lacks
+        * b. Increment ratio of smallest element amount
+        * 3. Repeat Steps 1-2 until amt of elements are equal (simple if [] === [])
+        * 4. Check the ratioes and divide by HCF once
+        * 
+        * FUNCTIONS:
+        * getEqualizerAmounts() -- Gets the amouns of elements on both sides
+        * findSmallest() -- Finds the smallest chemichal containing smallest amount
+        * HCF() -- Standard algoritim, finds HCF between an array of numbers
+        * 
+        */
     }
 
     //Determine the reaction type 
     getReactionType() {
-        console.log(reactdict)
         let type = [];
         for (let r in reactdict) {
-            if (reactdict[r].base == "name") {
+            if (reactdict[r].base === "name") {
                 let rsplit = r.split("+");
                 let checkreact = true;
                 for (let c in rsplit) {
@@ -177,7 +215,7 @@ class formula {
                     type.push(reactdict[r].name);
                 }
             }
-            else if (reactdict[r].base == "formula") {
+            else if (reactdict[r].base === "formula") {
                 let rsplit = r.split("+");
                 let checkreact = true;
                 for (let c in rsplit) {
@@ -190,7 +228,7 @@ class formula {
                 }
             }
         }
-        if (type == []) { type.push("none"); }
+        if (type === []) { type.push("none"); }
         return type;
     }
 
@@ -213,17 +251,40 @@ class formula {
     getId(formula) {
         let id = "";
         if (formula){
-            for (let chem in this.reactants) {
-                id += this.reactants[chem].formula;
-                if (chem != this.reactants.length-1) { id += "+"; }
+            for (let chem in this.reactants[0]) {
+                id += this.reactants[0][chem].formula;
+                if (chem != this.reactants[0].length - 1) {
+                    id += "+";
+                }
             }
         }
         else {
-            for (let chem in this.reactants) {
-                id += this.reactants[chem].type;
-                if (chem != this.reactants.length - 1) { id += "+"; }
+            for (let chem in this.reactants[0]) {
+                id += this.reactants[0][chem].type;
+                if (chem != this.reactants[0].length - 1) {
+                    id += "+";
+                }
             }
         }
         return id;
     }
+}
+
+//STANDARD FUNCTIONS
+
+//Get HCF between any two numbers
+function HCF(nums=[1]) {
+    let div = true;
+    let factor = 1;
+    while(div) {
+        factor++;
+        div = true;
+        for (let n in nums) {
+            if (!Number.isInteger(nums[n] / factor)) {
+                div = false;
+            }
+        }
+        
+    }
+    return factor-1;
 }

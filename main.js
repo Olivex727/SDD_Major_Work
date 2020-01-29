@@ -92,8 +92,8 @@ console.log(ion2.getMolarMass());
 
 //console.log(salt1.getDriver("enthalpy"));
 
-eq1 = new formula(false, [salt1, inmol1]);
-eq2 = new formula(false, [omol, inmol2]);
+eq1 = new formula(false, [[salt1, inmol1]]);
+eq2 = new formula(false, [[omol, inmol2]]);
 
 /*
 console.log(eq1.getId(false));
