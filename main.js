@@ -81,23 +81,27 @@ omol = new chemical("CH4", "Methane", "omol", -3);
 inmol1 = new chemical("H2O", "Water", "water", 0);
 inmol2 = new chemical("O2", "Oxygen", "oxygen", 0);
 
+/*
 console.log(salt2.getFormulaArray());
 console.log(salt1.getFormulaArray());
 console.log(ion2.getFormulaArray());
 
 console.log(salt1.getMolarMass());
 console.log(ion2.getMolarMass());
+*/
 
 //console.log(salt1.getDriver("enthalpy"));
 
 eq1 = new formula(false, [salt1, inmol1]);
 eq2 = new formula(false, [omol, inmol2]);
 
+/*
 console.log(eq1.getId(false));
 console.log(eq1.getId(true));
 
 console.log(eq2.getId(false));
 console.log(eq2.getId(true));
+*/
 
 eq1.react();
-eq2.react();
+//eq2.react();

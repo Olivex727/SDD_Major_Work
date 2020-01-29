@@ -40,5 +40,6 @@ app.get('/file', function (req, res) {
 
 //Host to port 8000
 app.listen(8000, function () {
-    console.log('listening on port 8000');
+    console.log('Listening on port 8000');
+    console.log('Server Hosted at localhost:8000');
 });

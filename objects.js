@@ -160,7 +160,7 @@ class formula {
         //
     }
 
-    //Determine the reaction type
+    //Determine the reaction type 
     getReactionType() {
         console.log(reactdict)
         let type = [];
