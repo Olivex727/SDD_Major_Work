@@ -115,7 +115,7 @@ class chemical {
             }
         }
 
-        //All number entries go to seperate arrays
+        //Al number entries go to seperate arrays
         return returnformula;
     }
 }
@@ -162,15 +162,22 @@ class formula {
                         type.splice(type.indexOf(item), 1)
                         if (!reactdict[r].std) {
                             for (let chem in reactdict[r].products.split("+")) {
-                                this.products[0].push(new chemical(reactdict[r].products.split("+")[chem]));
-                                this.products[1].push(1);
-                                this.products[2].push(0);
-                                this.products[3].push("mol");
+                                this.addToReact(reactdict[r].products.split("+")[chem]);
                             }
                             console.log(this.products);
                         }
                         else {
                             //Implement standardized system
+                            for (let c in reactdict[r].products.split("+")) {
+                                let chem = reactdict[r].products.split("+")[c];
+                                if (chem === "water") { this.addToReact("H2O", chem, chem); }
+                                if (chem === "oxygen") { this.addToReact("O2", chem, chem); }
+                                if (chem === "acid") { 
+                                    //
+                                    this.addToReact("H2O", chem, chem); 
+                                }
+                            }
+                            console.log(this.products);
                         }
                     }
                 }
@@ -268,6 +275,13 @@ class formula {
         }
         return id;
     }
+
+    addToReact(formula, type = null, name = null) {
+        this.products[0].push(new chemical(formula, name, type));
+        this.products[1].push(1);
+        this.products[2].push(0);
+        this.products[3].push("mol");
+    }
 }
 
 //STANDARD FUNCTIONS
@@ -278,13 +292,11 @@ function HCF(nums=[1]) {
     let factor = 1;
     while(div) {
         factor++;
-        div = true;
         for (let n in nums) {
             if (!Number.isInteger(nums[n] / factor)) {
                 div = false;
             }
-        }
-        
+        }     
     }
     return factor-1;
 }
