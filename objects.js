@@ -204,6 +204,48 @@ class formula {
         * HCF() -- Standard algoritim, finds HCF between an array of numbers
         * 
         */
+       console.log("CALCULATE");
+        let [reactnum, prodnum, equal] = this.getEqualizerAmts();
+        console.log(reactnum);
+        console.log(prodnum);
+    }
+
+    getEqualizerAmts() {
+        let reactnum = {};
+        let prodnum = {}
+        let newarr = []
+        //console.log(this.reactants[0]);
+        for (let c in this.reactants[0]) {
+            let chem = this.reactants[0][c];
+            newarr = chem.getFormulaArray();
+            for(let e in newarr) {
+                if (newarr[e][0] in reactnum) {
+                    //console.log("found");
+                    reactnum[newarr[e][0]] += newarr[e][1];
+                }
+                else {
+                    //console.log("none");
+                    reactnum[newarr[e][0]] = newarr[e][1];
+                }
+            }
+        }
+        console.log("PRODUCTS");
+        console.log(this.products[0]);
+        for (let c in this.products[0]) {
+            let chem = this.products[0][c];
+            newarr = chem.getFormulaArray();
+            console.log(newarr)
+            for (let e in newarr) {
+                if (newarr[e][0] in prodnum) {
+                    //console.log("found");
+                    prodnum[newarr[e][0]] += newarr[e][1];
+                } else {
+                    //console.log("none");
+                    prodnum[newarr[e][0]] = newarr[e][1];
+                }
+            }
+        }
+        return [reactnum, prodnum, true]
     }
 
     //Determine the reaction type 
@@ -300,3 +342,23 @@ function HCF(nums=[1]) {
     }
     return factor-1;
 }
+
+//Get LCM between any two numbers
+function LCM(nums=[1]) {
+    let lcm = 1;
+    let products = [];
+    for (let n in nums) {
+        lcm *= nums[n];
+    }
+    for (let n in nums) {
+        products[n] = lcm/nums[n];
+    }
+    let newhcf = HCF(products);
+    lcm *= 1/newhcf;
+    for (let n in nums) {
+        products[n] *= 1 / newhcf;
+    }
+    return [products, lcm];
+}
+
+//console.log(LCM([3, 2, 2]));
