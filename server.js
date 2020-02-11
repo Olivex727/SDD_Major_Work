@@ -29,6 +29,12 @@ app.get('/objjs', function (req, res) {
     res.send(page);
 });
 
+//Standard Algoritims
+app.get('/algo', function (req, res) {
+    const page = fs.readFileSync("standardalgos.js", 'utf8');
+    res.send(page);
+});
+
 //Send the styling script
 app.get('/css', function (req, res) {
     res.sendfile("webpage/style.css");
