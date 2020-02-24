@@ -142,10 +142,14 @@ class formula {
          * 4. Perform calculationsto find final chemichal amounts and the driver details
          * 
         */
-       console.log(reactdict);
+
+        //Async in JS is annoying...
+
+        console.log(reactdict);
         let type = this.getReactionType();
         console.log(type);
         this.formulateProducts(type);
+        console.log(this.products);
         this.equalize();
         this.calculate();
     }
@@ -177,7 +181,7 @@ class formula {
                                     this.addToReact("H2O", chem, chem); 
                                 }
                             }
-                            console.log(this.products);
+                            //console.log(this.products);
                         }
                     }
                 }
@@ -204,20 +208,146 @@ class formula {
         * HCF() -- Standard algoritim, finds HCF between an array of numbers
         * 
         */
-       console.log("CALCULATE");
+        /*
+        console.log("CALCULATE");
         let [reactnum, prodnum, equal] = this.getEqualizerAmts();
-        console.log(reactnum);
-        console.log(prodnum);
+        console.log(reactnum);console.log(prodnum);console.log(equal);
+        if (!equal) {
+            for (let c in chemicaldict) {
+                //console.log(Object.keys(chemicaldict).reverse()[c]);
+                if (c !== "H" && c !== "O" && Object.keys(reactnum).includes(x)) {
+                    let psmall = reactnum[c] > prodnum[c];
+                    
+                }
+            }
+        }
+        */
+
+        //STUB -- REMOVE ONCE GUI IS IMPLEMENTED
+        this.reactants.push([]);
+        this.reactants.push([]);
+        this.reactants.push([]);
+        for (let c in this.reactants[0]) {
+            this.reactants[1][c] = 1;
+            this.reactants[2][c] = 0;
+            this.reactants[3][c] = "mol";
+        }
+
+        const findSmallest = (set, ignore) => {
+            //Min value finding
+            let low = 0
+            if (Object.keys(set)[0] !== ignore || Object.keys(set).length == 1) {
+                low = set[Object.keys(set)[0]];
+            } else {
+                low = set[Object.keys(set)[1]];
+            }
+            let lowest = "";
+            for (let e in set) {
+                if (set[e] <= low && e !== ignore) {
+                    lowest = e;
+                    low = set[e];
+                }
+            }
+            //console.log(lowest + " " + low);
+            return [lowest, low];
+        }
+
+        let findSmallestChem = (set, chem) => { //set is this.reactants or this.products //chem is name
+            //Min value of number in chemical array
+            //Needs to get the set of all minimum element values and choose the ones with the lowest MM
+
+            let min = 0;
+            if (set[0].length > 1 && isNaN(findChemInFormArr(this.multiplyRatioes(set[0][0].getFormulaArray(), 0, set), chem))) {
+                min = findChemInFormArr(this.multiplyRatioes(set[0][1].getFormulaArray(), 0, set), chem);
+            } else {
+                min = findChemInFormArr(this.multiplyRatioes(set[0][0].getFormulaArray(), 0, set), chem);
+            }
+            let finalindex = -1;
+            let indexlist = [];
+            //console.log(min);
+
+            for (let c in set[0]) {
+                let current = findChemInFormArr(this.multiplyRatioes(set[0][c].getFormulaArray(), 0, set), chem);
+                if (!isNaN(current) && current <= min && current > 0) {
+                    min = current;
+                    indexlist.push(c);
+                }
+            }
+            //console.log(min);
+            //console.log(indexlist);
+
+            //indexlist.splice(0, 1);
+            //console.log(indexlist);
+            console.log([set[0], indexlist]);
+
+            //Search for the minimum Molar Mass value
+            let minMM = set[0][indexlist[0]].getMolarMass();
+            for (let i = 0; i < indexlist.length; i++) {
+                if (set[0][indexlist[i]].getMolarMass() <= minMM){
+                    minMM = set[0][indexlist[i]].getMolarMass();
+                    finalindex = indexlist[i];
+                }
+            }
+            //console.log(finalindex);
+
+            if (finalindex >= 0) {
+                return finalindex;
+            } else {
+                throw Error("Looks like there was a problem in finding the molar masses, finalindex = "+finalindex)
+            }
+        }
+
+        let [reactnum, prodnum, equal] = this.getEqualizerAmts();
+        let iteration = 0;
+        let ignore = "";
+
+        while (!equal) {
+            let [element, lowreact] = findSmallest(reactnum, ignore);
+            let lowprod = prodnum[element];
+
+            console.log([element, lowreact, lowprod]);
+
+            if (lowprod < lowreact) {
+                //console.log([element, lowreact, lowprod]);
+                //console.log(3.1);
+                let index = findSmallestChem(this.products, element);
+                this.products[1][index]++;
+                //console.log(this.products);
+            }
+            else if (lowprod > lowreact) {
+                //console.log(3.3);
+                let index = findSmallestChem(this.reactants, element);
+                this.reactants[1][index]++;
+                //console.log(this.reactants);
+            }
+            else if (lowprod == lowreact) {
+                //Do Nothing
+                console.log("EQUAL");
+                //console.log(this.reactants);
+                //console.log(this.products);
+                ignore = element;
+            }
+            
+            [reactnum, prodnum, equal] = this.getEqualizerAmts();
+
+            iteration++;
+            console.log("ITERATION: " + iteration);
+            if (iteration >= 10000) {
+                break;
+            }
+        }
+        console.log(equal);
     }
 
     getEqualizerAmts() {
         let reactnum = {};
         let prodnum = {}
         let newarr = []
-        //console.log(this.reactants[0]);
+
+        //Reactants
         for (let c in this.reactants[0]) {
             let chem = this.reactants[0][c];
-            newarr = chem.getFormulaArray();
+            newarr = this.multiplyRatioes(chem.getFormulaArray(), c, this.reactants);
             for(let e in newarr) {
                 if (newarr[e][0] in reactnum) {
                     //console.log("found");
@@ -229,12 +359,11 @@ class formula {
                 }
             }
         }
-        console.log("PRODUCTS");
-        console.log(this.products[0]);
+
+        //Products
         for (let c in this.products[0]) {
             let chem = this.products[0][c];
-            newarr = chem.getFormulaArray();
-            console.log(newarr)
+            newarr = this.multiplyRatioes(chem.getFormulaArray(), c, this.products);
             for (let e in newarr) {
                 if (newarr[e][0] in prodnum) {
                     //console.log("found");
@@ -245,7 +374,24 @@ class formula {
                 }
             }
         }
-        return [reactnum, prodnum, true]
+
+        //Check for equality
+        let equal = true;
+        for (let e in reactnum) {
+            //reactnum[e] = prodnum[e];
+            if (reactnum[e] != prodnum[e]) {
+                //console.log('UNEQUAL');
+                equal = false;
+            }
+        }
+        return [reactnum, prodnum, equal]
+    }
+
+    multiplyRatioes(arr, index, set) {
+        for (let c in arr) {
+            arr[c][1] *= set[1][index];
+        }
+        return arr;
     }
 
     //Determine the reaction type 
@@ -359,6 +505,20 @@ function LCM(nums=[1]) {
         products[n] *= 1 / newhcf;
     }
     return [products, lcm];
+}
+
+//Converts a getFormulaArray() structure to dictionary
+function convertFormArrToDict(arr) {
+    let dict = {};
+    for (let c in arr) {
+        dict[arr[c][0]] = arr[c][1];
+    }
+    return dict;
+}
+
+//Finds a specific item in the getFormulaArray() structure
+function findChemInFormArr(arr, key) {
+    return convertFormArrToDict(arr)[key];
 }
 
 //console.log(LCM([3, 2, 2]));
