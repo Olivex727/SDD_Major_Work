@@ -251,12 +251,77 @@ class formula {
             //console.log(lowest + " " + low);
             return [lowest, low];
         }
+    
+        //ignore is the most recent element to reach equality. ignoreset is the list that have achived equality
+        let determineUsability = (set, chem, ignore = "", ignoreset = []) => {
+            /*
+             * WHAT QUALIFIES AS USABLE:
+             * 
+             * 1. Ignored elements are in Chemical (to ensure that equality is reached)
+             * 2. Focus element is in Chemical
+             * 3. If using the ignoreset elements isn't possible, it will just ignore the value of the 'ignore' identifier only
+             * 4. If the set size is 1, it will choose that only item
+             * 
+             */
+            
+            ignoreset = ["H", "O"];
+            ignore = "H";
 
-        let findSmallestChem = (set, chem) => { //set is this.reactants or this.products //chem is name
+            let indexes = [];
+            let condition1 = [];
+
+            if (set[0].length > 1) {
+                for (let c in set[0]) {
+                    //Satisfies Condition 2
+                    if (!isNaN(findChemInFormArr(this.multiplyRatioes(set[0][c].getFormulaArray(), 0, set), chem))) {
+                        //Satisfies Condition 1
+                        condition1.push(c);
+                        let pass = true;
+                        for (let i in ignoreset) {
+                            if (!isNaN(findChemInFormArr(this.multiplyRatioes(set[0][c].getFormulaArray(), 0, set), ignoreset[i]))) {
+                                pass = false;
+                            }
+                        }
+                        console.log(pass); console.log(set[0][c]);
+                        if (pass) {
+                            indexes.push(c);
+                        }
+                    }
+                }
+            }
+            else {
+                indexes.push(0);
+            }
+
+            //Check if array has any elements, if not, check satisfation of condition 3
+            if (indexes.length == 0) {
+                for (let c in condition1) {
+                    if (isNaN(findChemInFormArr(this.multiplyRatioes(set[0][c].getFormulaArray(), 0, set), ignore))) {
+                        indexes.push(c);
+                    }
+                }
+            }
+
+            //If the list is still empty, then just set it to a default value
+            if (indexes.length == 0) {
+                indexes.push(0);
+            }
+
+            return indexes;
+
+        }
+
+        let findSmallestChem = (set, chem, ignore = "", ignoreset=[]) => { //set is this.reactants or this.products //chem is name
             //Min value of number in chemical array
             //Needs to get the set of all minimum element values and choose the ones with the lowest MM
 
+            //The selection process for usable chemicals
+            let useable = determineUsability(set, chem, ignore, ignoreset);
+            console.log("USEABLE: " + useable);
+
             let min = 0;
+            //IF <the ignored chemicals are not in the set> AND <The set contains more than one term> AND <If the 1st formula is not a number>
+
             if (set[0].length > 1 && isNaN(findChemInFormArr(this.multiplyRatioes(set[0][0].getFormulaArray(), 0, set), chem))) {
                 min = findChemInFormArr(this.multiplyRatioes(set[0][1].getFormulaArray(), 0, set), chem);
             } else {
@@ -305,18 +370,19 @@ class formula {
             let [element, lowreact] = findSmallest(reactnum, ignore);
             let lowprod = prodnum[element];
 
-            console.log([element, lowreact, lowprod]);
+            //console.log([element, lowreact, lowprod]);
+            //console.log(this.reactants);
 
             if (lowprod < lowreact) {
                 //console.log([element, lowreact, lowprod]);
                 //console.log(3.1);
-                let index = findSmallestChem(this.products, element);
+                let index = findSmallestChem(this.products, element, ignore);
                 this.products[1][index]++;
                 //console.log(this.products);
             }
             else if (lowprod > lowreact) {
                 //console.log(3.3);
-                let index = findSmallestChem(this.reactants, element);
+                let index = findSmallestChem(this.reactants, element, ignore);
                 this.reactants[1][index]++;
                 //console.log(this.reactants);
             }
@@ -332,7 +398,7 @@ class formula {
 
             iteration++;
             console.log("ITERATION: " + iteration);
-            if (iteration >= 10000) {
+            if (iteration >= 10) {
                 break;
             }
         }
