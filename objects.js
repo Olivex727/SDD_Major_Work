@@ -252,9 +252,9 @@ class formula {
             return [lowest, low];
         }
 
-        let determineIgnoreSet = (reactnum, prodnum) => {
+        let determineIgnoreSet = (reactnum, prodnum, element) => {
             let igset = [];
-            console.log(reactnum);
+            console.log(reactnum, prodnum);
             for (let c in reactnum) {
                 if (reactnum[c] == prodnum[c]) {
                     igset.push(c);
@@ -275,9 +275,6 @@ class formula {
              * 4. If the set size is 1, it will choose that only item
              * 
              */
-            
-            ignoreset = ["H", "O"];
-            ignore = "H";
 
             let indexes = [];
             let condition1 = [];
@@ -304,19 +301,31 @@ class formula {
                 indexes.push(0);
             }
 
+            //console.log(indexes, ignore, ignoreset);
+
             //Check if array has any elements, if not, check satisfation of condition 3
             if (indexes.length == 0) {
                 for (let c in condition1) {
                     if (isNaN(findChemInFormArr(this.multiplyRatioes(set[0][c].getFormulaArray(), 0, set), ignore))) {
-                        indexes.push(c);
+                        indexes.push(condition1[c]);
                     }
                 }
             }
+
+            //If nothing else works, just output the chemicals that contain the element
+            if (indexes.length == 0) {
+                for (let c in condition1) {
+                    indexes.push(condition1[c]);
+                }
+            }
+
+            console.log(condition1);
 
             //If the list is still empty, then just set it to a default value
             if (indexes.length == 0) {
                 indexes.push(0);
             }
+            
 
             return indexes;
 
@@ -333,20 +342,20 @@ class formula {
             let min = 0;
             //IF <the ignored chemicals are not in the set> AND <The set contains more than one term> AND <If the 1st formula is not a number>
 
-            if (set[0].length > 1 && isNaN(findChemInFormArr(this.multiplyRatioes(set[0][0].getFormulaArray(), 0, set), chem))) {
-                min = findChemInFormArr(this.multiplyRatioes(set[0][1].getFormulaArray(), 0, set), chem);
-            } else {
-                min = findChemInFormArr(this.multiplyRatioes(set[0][0].getFormulaArray(), 0, set), chem);
-            }
+            //if (set[0].length > 1 && isNaN(findChemInFormArr(this.multiplyRatioes(set[0][0].getFormulaArray(), 0, set), chem))) {
+            min = findChemInFormArr(this.multiplyRatioes(set[0][useable[0]].getFormulaArray(), 0, set), chem);
+            //} else {
+            //  min = findChemInFormArr(this.multiplyRatioes(set[0][0].getFormulaArray(), 0, set), chem);
+            //}
             let finalindex = -1;
             let indexlist = [];
-            //console.log(min);
+            console.log(this.multiplyRatioes(set[0][useable[0]].getFormulaArray(), 0, set));
 
-            for (let c in set[0]) {
-                let current = findChemInFormArr(this.multiplyRatioes(set[0][c].getFormulaArray(), 0, set), chem);
+            for (let c in useable) {
+                let current = findChemInFormArr(this.multiplyRatioes(set[0][useable[c]].getFormulaArray(), 0, set), chem);
                 if (!isNaN(current) && current <= min && current > 0) {
                     min = current;
-                    indexlist.push(c);
+                    indexlist.push(useable[c]);
                 }
             }
             //console.log(min);
@@ -379,13 +388,14 @@ class formula {
         let ignoreset = [];
 
         while (!equal) {
-            ignoreset = determineIgnoreSet(reactnum, prodnum);
 
             let [element, lowreact] = findSmallest(reactnum, ignore);
             let lowprod = prodnum[element];
 
+            ignoreset = determineIgnoreSet(reactnum, prodnum, element);
+
             //console.log([element, lowreact, lowprod]);
-            //console.log(this.reactants);
+            console.log(element);
 
             if (lowprod < lowreact) {
                 //console.log([element, lowreact, lowprod]);
@@ -411,8 +421,10 @@ class formula {
             [reactnum, prodnum, equal] = this.getEqualizerAmts();
 
             iteration++;
+            console.log(this.products);
+            console.log(this.reactants);
             console.log("ITERATION: " + iteration);
-            if (iteration >= 10) {
+            if (iteration >= 100) {
                 break;
             }
         }

@@ -1,4 +1,4 @@
 base|name|reactants|products|eq|standard
-formula|dissolution|H2O+(NH4)2NO3|NH4+NO3|0|false
+formula|dissolution|H2O+(NH4)2NO3|NH4+NO3+H20|0|false
 name|combustion|oxygen+omol|water+carbon dioxide+omol|0|true
 name|dissolution|water+salt|ion+ion|0|true
