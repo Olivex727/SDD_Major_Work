@@ -251,6 +251,18 @@ class formula {
             //console.log(lowest + " " + low);
             return [lowest, low];
         }
+
+        let determineIgnoreSet = (reactnum, prodnum) => {
+            let igset = [];
+            console.log(reactnum);
+            for (let c in reactnum) {
+                if (reactnum[c] == prodnum[c]) {
+                    igset.push(c);
+                }
+            }
+            console.log("IGSET:" + igset);
+            return igset;
+        }
     
         //ignore is the most recent element to reach equality. ignoreset is the list that have achived equality
         let determineUsability = (set, chem, ignore = "", ignoreset = []) => {
@@ -282,7 +294,6 @@ class formula {
                                 pass = false;
                             }
                         }
-                        console.log(pass); console.log(set[0][c]);
                         if (pass) {
                             indexes.push(c);
                         }
@@ -343,7 +354,7 @@ class formula {
 
             //indexlist.splice(0, 1);
             //console.log(indexlist);
-            console.log([set[0], indexlist]);
+            //console.log([set[0], indexlist]);
 
             //Search for the minimum Molar Mass value
             let minMM = set[0][indexlist[0]].getMolarMass();
@@ -365,8 +376,11 @@ class formula {
         let [reactnum, prodnum, equal] = this.getEqualizerAmts();
         let iteration = 0;
         let ignore = "";
+        let ignoreset = [];
 
         while (!equal) {
+            ignoreset = determineIgnoreSet(reactnum, prodnum);
+
             let [element, lowreact] = findSmallest(reactnum, ignore);
             let lowprod = prodnum[element];
 
@@ -376,13 +390,13 @@ class formula {
             if (lowprod < lowreact) {
                 //console.log([element, lowreact, lowprod]);
                 //console.log(3.1);
-                let index = findSmallestChem(this.products, element, ignore);
+                let index = findSmallestChem(this.products, element, ignore, ignoreset);
                 this.products[1][index]++;
                 //console.log(this.products);
             }
             else if (lowprod > lowreact) {
                 //console.log(3.3);
-                let index = findSmallestChem(this.reactants, element, ignore);
+                let index = findSmallestChem(this.reactants, element, ignore, ignoreset);
                 this.reactants[1][index]++;
                 //console.log(this.reactants);
             }
