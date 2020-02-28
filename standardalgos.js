@@ -1,8 +1,8 @@
 console.log("STANDARD ALGOS");
 
-let array = []
+let arr = []
 
-function fillArray(length) {
+function fillArray(array, length) {
     length--;
     let randInt = 0;
     let randIndex = 0;
@@ -13,21 +13,22 @@ function fillArray(length) {
         }
         array[randIndex] = randInt;
     }
+    return array;
 }
 
 //Testing stuff \/
-fillArray(10);
-shuffle(1000)
-console.log(array);
-bubbleSort();
+fillArray(arr, 10);
+shuffle(arr, 1000)
+console.log(arr);
+bubbleSort(arr);
 console.log("Insertion: ");
-console.log(array);
-console.log(getMax()[0]);
-console.log(getMin()[0]);
-console.log(binarySearch(4));
+console.log(arr);
+console.log(getMax(arr)[0]);
+console.log(getMin(arr)[0]);
+console.log(binarySearch(arr, 4));
 //Testing stuff /\
 
-function shuffle(num) {
+function shuffle(array, num) {
     for (var i = 0; i < num; i++) {
         var a = Math.round(Math.random() * (array.length - 1));
         var b = Math.round(Math.random() * (array.length - 1));
@@ -35,9 +36,10 @@ function shuffle(num) {
         array[a] = array[b];
         array[b] = temp;
     }
+    return array;
 }
 
-function bubbleSort() {
+function bubbleSort(array) {
     let swapped = true;
     while (swapped) {
         swapped = false;
@@ -52,9 +54,10 @@ function bubbleSort() {
             compare++;
         }
     }
+    return array;
 }
 
-function selectionSort() {
+function selectionSort(array) {
     let min = 0;
     for (let i = 0; i < array.length; i++) {
         min = getMin()[1];
@@ -62,9 +65,10 @@ function selectionSort() {
         array[i] = array[min];
         array[min] = temp;
     }
+    return array;
 }
 
-function insertionSort() {
+function insertionSort(array) {
     for (let i = 1; i < array.length; i++) {
         for (let comp = 0; comp < array.length; comp++) {
             if (array[comp] >= array[i]) {
@@ -83,9 +87,10 @@ function insertionSort() {
             }
         }
     }
+    return array;
 }
 
-function linearSearch(num) {
+function linearSearch(array, num) {
     let index = -1;
     for (let i in array) {
         if (array[i] == num) {
@@ -96,7 +101,7 @@ function linearSearch(num) {
     return index;
 }
 
-function binarySearch(num) {
+function binarySearch(array, num) {
     let min = 0;
     let max = array.length -1;
     let found = false;
@@ -118,7 +123,7 @@ function binarySearch(num) {
     return index;
 }
 
-function getMax() {
+function getMax(array) {
     let max = array[0];
     let index = 0;
     for (let i in array) {
@@ -130,7 +135,7 @@ function getMax() {
     return [max, index];
 }
 
-function getMin() {
+function getMin(array) {
     let min = array[0];
     let index = 0;
     for (let i in array) {

@@ -79,9 +79,6 @@ ion2 = new chemical("PO4", "Nitrate ion", "ion", -3);
 omol = new chemical("CH4", "Methane", "omol", -3);
 inmol2 = new chemical("O2", "Oxygen", "oxygen", 0);
 
-salt1 = new chemical("(NH4)2NO3", "Ammonium Sulfate", "salt", 0);
-inmol1 = new chemical("H2O", "Water", "water", 0);
-
 /*
 console.log(salt2.getFormulaArray());
 console.log(salt1.getFormulaArray());
