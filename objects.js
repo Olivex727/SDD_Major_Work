@@ -205,25 +205,10 @@ class formula {
         * 3. Repeat Steps 1-2 until amt of elements are equal (simple if [] === [])
         * 4. Check the ratioes and divide by HCF once
         * 
-        * FUNCTIONS:
+        * PRIMARY FUNCTIONS (Outside of function):
         * getEqualizerAmounts() -- Gets the amouns of elements on both sides
-        * findSmallest() -- Finds the smallest chemichal containing smallest amount
-        * HCF() -- Standard algoritim, finds HCF between an array of numbers
+        * HCF() --Standard algoritim, finds HCF between an array of numbers
         * 
-        */
-        /*
-        console.log("CALCULATE");
-        let [reactnum, prodnum, equal] = this.getEqualizerAmts();
-        console.log(reactnum);console.log(prodnum);console.log(equal);
-        if (!equal) {
-            for (let c in chemicaldict) {
-                //console.log(Object.keys(chemicaldict).reverse()[c]);
-                if (c !== "H" && c !== "O" && Object.keys(reactnum).includes(x)) {
-                    let psmall = reactnum[c] > prodnum[c];
-                    
-                }
-            }
-        }
         */
 
         //STUB -- REMOVE ONCE GUI IS IMPLEMENTED
@@ -236,6 +221,7 @@ class formula {
             this.reactants[3][c] = "mol";
         }
 
+        //Finds the smallest element amount in the set
         const findSmallest = (set, ignore) => {
             //Min value finding
             let low = 0
@@ -251,10 +237,10 @@ class formula {
                     low = set[e];
                 }
             }
-            //console.log(lowest + " " + low);
             return [lowest, low];
         }
 
+        //Determines what chemicals can be ignored when finding how they can be manipulated
         let determineIgnoreSet = (reactnum, prodnum, element) => {
             let igset = [];
             console.log(reactnum, prodnum);
@@ -267,7 +253,7 @@ class formula {
             return igset;
         }
     
-        //ignore is the most recent element to reach equality. ignoreset is the list that have achived equality
+        //Ignore is the most recent element to reach equality. ignoreset is the list that have acheived equality
         let determineUsability = (set, chem, ignore = "", ignoreset = []) => {
             /*
              * WHAT QUALIFIES AS USABLE:
@@ -303,8 +289,6 @@ class formula {
             else {
                 indexes.push(0);
             }
-
-            //console.log(indexes, ignore, ignoreset);
 
             //Check if array has any elements, if not, check satisfation of condition 3
             if (indexes.length == 0) {
@@ -348,6 +332,7 @@ class formula {
 
         }
 
+        //Finds the smallest chemical that allows for such to be incremented in ratio
         let findSmallestChem = (set, chem, ignore = "", ignoreset=[]) => { //set is this.reactants or this.products //chem is name
             //Min value of number in chemical array
             //Needs to get the set of all minimum element values and choose the ones with the lowest MM
@@ -357,13 +342,8 @@ class formula {
             console.log("USEABLE: " + useable);
 
             let min = 0;
-            //IF <the ignored chemicals are not in the set> AND <The set contains more than one term> AND <If the 1st formula is not a number>
 
-            //if (set[0].length > 1 && isNaN(findChemInFormArr(this.multiplyRatioes(set[0][0].getFormulaArray(), 0, set), chem))) {
             min = findChemInFormArr(this.multiplyRatioes(set[0][useable[0]].getFormulaArray(), 0, set), chem);
-            //} else {
-            //  min = findChemInFormArr(this.multiplyRatioes(set[0][0].getFormulaArray(), 0, set), chem);
-            //}
             let finalindex = -1;
             let indexlist = [];
             console.log(this.multiplyRatioes(set[0][useable[0]].getFormulaArray(), 0, set));
@@ -375,12 +355,6 @@ class formula {
                     indexlist.push(useable[c]);
                 }
             }
-            //console.log(min);
-            //console.log(indexlist);
-
-            //indexlist.splice(0, 1);
-            //console.log(indexlist);
-            //console.log([set[0], indexlist]);
 
             //Search for the minimum Molar Mass value
             let minMM = set[0][indexlist[0]].getMolarMass();
@@ -390,7 +364,6 @@ class formula {
                     finalindex = indexlist[i];
                 }
             }
-            //console.log(finalindex);
 
             if (finalindex >= 0) {
                 return finalindex;
@@ -399,9 +372,8 @@ class formula {
             }
         }
 
+        //Checks the reaction data for equalities via use of the HCF/GCD of the data
         let checkUsingHCF = () => {
-            //this.reactants = [[inmol1, salt1], [1, 19]]
-            //this.products = [[inmol1, new chemical("NH4", null, null), new chemical("NO3", null, null)], [1, 34, 17]]
 
             console.log("CHECKHCF:");
             let equals = {}
@@ -420,7 +392,8 @@ class formula {
             console.log(equals);
             let dummyreact = []; let dummyprod = [];
 
-            //Append the non-equal chemicals to an array //Fill dummy array with ones
+            //Append the non-equal chemicals to an array
+            //Fill dummy array with ones
             for (let r in this.reactants[0]) {
                 if (!Object.keys(equals).includes(this.reactants[0][r].formula)) {
                     newreacts.push(this.reactants[1][r]);
@@ -441,8 +414,6 @@ class formula {
             }
 
             const rhcf = HCF(newreacts); const phcf = HCF(newprods);
-            //console.log(rhcf, phcf);
-            //console.log(newreacts, newprods);
 
             //Divide the array elements by its HCF
             for (let c in newreacts) {
@@ -507,6 +478,7 @@ class formula {
             ignoreset = determineIgnoreSet(reactnum, prodnum, element);
             console.log(element);
 
+            //Determine the side that will be manipulated
             if (lowprod < lowreact) {
                 let index = findSmallestChem(this.products, element, ignore, ignoreset);
                 this.products[1][index]++;
@@ -516,7 +488,6 @@ class formula {
                 this.reactants[1][index]++;
             }
             else if (lowprod == lowreact) {
-                //Do Nothing
                 console.log("EQUAL");
                 ignore = element;
             }
@@ -527,11 +498,14 @@ class formula {
 
             iteration++;
             console.log("ITERATION: " + iteration);
-            if (iteration >= 100) {
+
+            //After 10000 recycles, it is clear that the reaction won't work and the program will not calculate
+            if (iteration >= 10000) {
+                alert("The reaction could not be calculated. Make sure your inputs are valid or to look up the set of valid reactions in the User Manual");
                 break;
             }
         }
-        
+
         console.log(equal);
         checkUsingHCF();
         console.log(this.reactants, this.products);
