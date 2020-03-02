@@ -31,7 +31,8 @@ for (let e in pt) {
         entropy: parseFloat(elm[3]),
         mp: parseFloat(elm[4]),
         bp: parseFloat(elm[5]),
-        red_pot: parseFloat(elm[6])
+        red_pot: parseFloat(elm[6]),
+        density: parseFloat(elm[7])
     };
 }
 console.log(driverdict);

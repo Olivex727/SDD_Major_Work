@@ -1,2 +1,3 @@
-formula|state|∆H|∆S|MP|BP|∆Vr
-NaCl|aq|-411.12|72|1073.8|1738|0
+formula|state|∆H|∆S|MP|BP|∆Vr|Density
+NaCl|aq|-411.12|72|1073.8|1738|0|-1
+H2O|l|0|0|298.15|398.15|0|1

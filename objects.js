@@ -127,7 +127,7 @@ let inmol1 = new chemical("H2O", "Water", "water", 0);
 class formula {
     constructor(eq, reactants=[[], [], [], []], conditions=[]) {
         this.reactants = reactants; //Array of 3-size arrays [chemichal, Ratio, Amount, Units]
-        this.conditions = conditions;
+        this.conditions = conditions; //Tempurature, Pressure etc.
         this.isDynamic = eq; //Static or Dynamic
 
         this.products = [[], [], [], []];
@@ -153,8 +153,9 @@ class formula {
         console.log(type);
         this.formulateProducts(type);
         console.log(this.products);
-        this.equalize();
-        this.calculate();
+        if (this.equalize()) {
+            this.calculate();
+        }
     }
 
     //Formulate the products based on the reaction type
@@ -470,6 +471,8 @@ class formula {
         let ignore = "";
         let ignoreset = [];
 
+        let complete = true;
+
         while (!equal) {
 
             let [element, lowreact] = findSmallest(reactnum, ignore);
@@ -502,6 +505,7 @@ class formula {
             //After 10000 recycles, it is clear that the reaction won't work and the program will not calculate
             if (iteration >= 10000) {
                 alert("The reaction could not be calculated. Make sure your inputs are valid or to look up the set of valid reactions in the User Manual");
+                complete = false;
                 break;
             }
         }
@@ -509,6 +513,7 @@ class formula {
         console.log(equal);
         checkUsingHCF();
         console.log(this.reactants, this.products);
+        return complete;
     }
 
     getEqualizerAmts(reacts=this.reactants, prods=this.products) {
@@ -601,7 +606,156 @@ class formula {
 
     //Perform calculations on the reaction
     calculate() {
-        //
+        //STUB -- REMOVE WHEN GUI
+        console.log("Calculate");
+        let precision = 4;
+        for (let n in this.reactants[2]) {
+            this.reactants[2][n] = round(25 /*Math.random()* 100*/, precision, true);
+        }
+        //console.log(this.reactants[2]);
+
+        this.reactants[3][0] = "g";
+
+        console.log(this.reactants[2]);
+        console.log(this.reactants[3]);
+
+        //Tempurature, Pressure, Volume of Water
+        this.conditions = [[298.15, 100, 10], ["K", "kPa", "L"]];
+        //END STUB
+        //console.log(this.convertUnits(inmol1, 1, "L", "mol"));
+
+        let newprod = [];
+        let newreact = [];
+
+        //Convert all values into moles
+        for (let c in this.reactants[0]) {
+            newreact.push(this.reactants[2][c]);
+            newreact[c] = round(this.convertUnits(this.reactants[0][c], newreact[c], this.reactants[3][c], "mol"), precision);
+        }
+
+        console.log(newreact);
+
+    }
+
+    //Converts unit amounts into others
+    convertUnits(chem, val, oldu, newu) {
+        let newval = 0;
+        let newcons = [];
+
+        console.log(chem, val, oldu, newu)
+        //!!!NO IMPERIAL UNITS!!!
+        //===Convert Conditions to Kelvins/Pascals===//
+        //Celsius
+        if (this.conditions[1][0].includes("C")) {
+            newcons[0] = this.conditions[0][0] - 273.15;
+        }
+        //Kelvin
+        else {
+            newcons[0] = this.conditions[0][0];
+        }
+
+        //Pascals
+        if (this.conditions[1][1].includes("Pa")) {
+            newcons[1] = this.conditions[0][1];
+            if (this.conditions[1][1].includes("m")) {
+                newcons[1] *= 1/1000;
+            }
+            else if (this.conditions[1][1].includes("K")) {
+                newcons[1] *= 1000;
+            }
+            else if (this.conditions[1][1].includes("M")) {
+                newcons[1] *= 1000000;
+            }
+        }
+        //Atmospheres
+        else if (this.conditions[1][1].includes("atm")) {
+            newcons[1] = this.conditions[0][1] * 101.325;
+        }
+
+        //Litres
+        newcons[2] *= this.conditions[0][2];
+        if (this.conditions[1][2].includes("m")) {
+            newcons[2] *= 1 / 1000;
+        } else if (this.conditions[1][2].includes("K")) {
+            newcons[2] *= 1000;
+        }
+
+        //===Convert to moles===//
+        //Units of amount
+        if (oldu === "mol") {
+            newval = val;
+        }
+        //Units of mass
+        else if (oldu.includes("g")) {
+            // n = m/M
+            newval = val / chem.getMolarMass();
+        }
+        //Units of volume
+        else if (oldu.includes("L")) {
+            if (chem.getDriver("state") === "g") {
+                // PV = nRT
+                // n = PV/RT
+                newval = (val * newcons[1]) / (8.3145 * newcons[0]);
+            }
+            else if (chem.getDriver("state") === "l") {
+                newval = (val * chem.getDriver("density") * 1000) / chem.getMolarMass();
+            }
+        }
+        //Units of Concentration
+        else if (oldu.includes("M")) {
+            newval = val * newcons[2];
+        }
+
+        //Manage SI Units
+        if ((oldu.includes("m") && !oldu.includes("mol")) || oldu === "mmol") {
+            newval *= 1 / 1000;
+        }
+        else if (oldu.includes("K")) {
+            newval *= 1000;
+        }
+        else if (oldu.includes("µ")) {
+            newval *= 1 / 1000000;
+        }
+
+        //===Convert out of moles===//
+        //Units of amount
+        if (newu.includes("mol")) {
+            //Nothing
+        }
+        //Units of mass
+        else if (newu.includes("g")) {
+            // m = nM
+            newval *= chem.getMolarMass();
+            
+        }
+        //Units of volume
+        else if (oldu.includes("L")) {
+            // PV = nRT
+            // V = nRT/P
+            if (chem.getDriver("state") === "g") {
+                newval = (8.3145 * val * newcons[0]) / (newcons[1]);
+            } else if (chem.getDriver("state") === "l") {
+                newval = (val * chem.getMolarMass()) / (chem.getDriver("density") * 1000);
+            }
+            
+        }
+        //Units of Concentration
+        else if (oldu.includes("M")) {
+            newval = val / newcons[2];
+        }
+        
+        //Manage SI Units
+        if ((newu.includes("m") && !newu.includes("mol")) || newu === "mmol") {
+            newval *= 1000;
+        }
+        else if (newu.includes("K")) {
+            newval *= 1 / 1000;
+        }
+        else if (newu.includes("µ")) {
+            newval *= 1000000;
+        }
+
+        return newval;
     }
 
     //Get the Equilibrium constant for the reaction
@@ -707,6 +861,73 @@ function convertFormArrToDict(arr) {
 //Finds a specific item in the getFormulaArray() structure
 function findChemInFormArr(arr, key) {
     return convertFormArrToDict(arr)[key];
+}
+
+//console.log("WEBUWDWEDHWEDHBWEDHJBKW")
+//console.log(round(12345.6789101, 3), round(0.000910198, 5), round(999.999999999, 1));
+
+
+//Rounds a number to a decimal place value or significant figure
+function round(num, prec, dp=false) {
+    if (dp) {
+        return Math.round(num * Math.pow(10, prec)) / Math.pow(10, prec);
+    }
+    else {
+        let numarr = num.toString().split('');
+        let newnum = [];
+        let sig = false;
+        let sigstart = 0;
+        let end = false;
+        let endindex = 0;
+
+        for (let i = 0; i < numarr.length; i++) {
+
+            if (!end && !sig && numarr[i] !== "0" && numarr[i] !== ".") {
+                sig = true;
+                sigstart = i;
+            }
+
+            if (!end && sig) {
+                newnum.push(numarr[i]);
+            }
+            else if (numarr[i] === ".") {
+                newnum.push(".");
+            }
+            else {
+                newnum.push("0");
+            }
+
+            if (sig && i == prec + sigstart - 1) {
+                end = true;
+                endindex = i;
+            }
+        }
+
+        newnum.push("0");
+        numarr.push("0");
+        if (parseInt(numarr[endindex + 1]) >= 5 && newnum[endindex] !== "9") {
+            newnum[endindex] = parseInt(numarr[endindex]) + 1;
+        }
+        else if (parseInt(numarr[endindex + 1]) >= 5 && newnum[endindex] === "9") {
+            let x = 0
+            while (x < endindex && newnum[endindex - x] === "9") {
+                x++;
+                newnum[endindex - x + 1] = "0";
+                if (newnum[endindex - x] !== ".") {
+                    newnum[endindex - x] = (parseInt(numarr[endindex - 1]) + 1).toString();
+                }
+                else if (newnum[endindex - x - 1] !== ".") {
+                    x++;
+                    newnum[endindex - x] = (parseInt(numarr[endindex - x]) + 1).toString();
+                }
+            }
+            if (x == endindex) {
+                newnum[0] = "10";
+            }
+        }
+
+        return parseFloat(newnum.join(''));
+    }
 }
 
 //console.log(LCM([3, 2, 2]));
