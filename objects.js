@@ -126,9 +126,10 @@ let inmol1 = new chemical("H2O", "Water", "water", 0);
 //Formula class is where all of the main reaction stuff is handled
 class formula {
     constructor(eq, reactants=[[], [], [], []], conditions=[]) {
-        this.reactants = reactants; //Array of 3-size arrays [chemichal, Ratio, Amount, Units]
+        this.reactants = reactants; //Array of 3-size arrays [chemical, Ratio, Amount, Units]
         this.conditions = conditions; //Tempurature, Pressure etc.
         this.isDynamic = eq; //Static or Dynamic
+        this.excess = [[], [], []] //Excess unreacted chemicals [chemical, amount, units]
 
         this.products = [[], [], [], []];
         this.equilibrum = this.getEq();
@@ -154,7 +155,7 @@ class formula {
         this.formulateProducts(type);
         console.log(this.products);
         if (this.equalize()) {
-            this.calculate();
+            console.log(this.calculate());
         }
     }
 
@@ -606,43 +607,66 @@ class formula {
 
     //Perform calculations on the reaction
     calculate() {
-        //STUB -- REMOVE WHEN GUI
+        //STUB -- REMOVE WHEN GUI IS IMPLEMENTED
         console.log("Calculate");
         let precision = 4;
         for (let n in this.reactants[2]) {
-            this.reactants[2][n] = round(25 /*Math.random()* 100*/, precision, true);
+            this.reactants[2][n] = round(25 /*Math.random()* 100*/ , precision, true);
         }
         //console.log(this.reactants[2]);
 
         this.reactants[3][0] = "g";
 
-        console.log(this.reactants[2]);
-        console.log(this.reactants[3]);
+        this.products[3] = ["mol", "mol", "g"];
 
         //Tempurature, Pressure, Volume of Water
         this.conditions = [[298.15, 100, 10], ["K", "kPa", "L"]];
         //END STUB
-        //console.log(this.convertUnits(inmol1, 1, "L", "mol"));
 
-        let newprod = [];
         let newreact = [];
 
-        //Convert all values into moles
+        //Convert all reactant values into moles
         for (let c in this.reactants[0]) {
             newreact.push(this.reactants[2][c]);
             newreact[c] = round(this.convertUnits(this.reactants[0][c], newreact[c], this.reactants[3][c], "mol"), precision);
         }
 
-        console.log(newreact);
+        //Get the basic mole ratio, Finding the smallest amounts (And the limiting reagent)
+        let basicmol = newreact[0] / this.reactants[1][0];
+        let limitreag = 0;
+        let exchem = [];
+        for (let c in this.reactants[0]) {
+            if (basicmol > newreact[c] / this.reactants[1][c]) {
+                basicmol = newreact[c] / this.reactants[1][c];
+                limitreag = parseInt(c);
+            }
+        }
+        for (let c in this.reactants[0]) {
+            if (basicmol < newreact[c] / this.reactants[1][c]) {
+                exchem.push(parseInt(c));
+            }
+        }
 
+        //Add amount values to the products
+        for (let c in this.products[0]) {
+            this.products[2][c] = round(this.convertUnits(this.products[0][c], (this.products[1][c] * basicmol), "mol", this.products[3][c]), precision);
+        }
+
+        //Add excess chemical information
+        for (let c in exchem) {
+            this.excess[0][c] = this.reactants[0][exchem[c]];
+            this.excess[1][c] = newreact[exchem[c]] - basicmol;
+            this.excess[2][c] = "mol";
+        }
+
+        return this.reactants[0][limitreag];
     }
 
     //Converts unit amounts into others
     convertUnits(chem, val, oldu, newu) {
         let newval = 0;
         let newcons = [];
-
-        console.log(chem, val, oldu, newu)
+        
         //!!!NO IMPERIAL UNITS!!!
         //===Convert Conditions to Kelvins/Pascals===//
         //Celsius
@@ -743,7 +767,7 @@ class formula {
         else if (oldu.includes("M")) {
             newval = val / newcons[2];
         }
-        
+
         //Manage SI Units
         if ((newu.includes("m") && !newu.includes("mol")) || newu === "mmol") {
             newval *= 1000;
@@ -863,10 +887,6 @@ function findChemInFormArr(arr, key) {
     return convertFormArrToDict(arr)[key];
 }
 
-//console.log("WEBUWDWEDHWEDHBWEDHJBKW")
-//console.log(round(12345.6789101, 3), round(0.000910198, 5), round(999.999999999, 1));
-
-
 //Rounds a number to a decimal place value or significant figure
 function round(num, prec, dp=false) {
     if (dp) {
@@ -879,6 +899,7 @@ function round(num, prec, dp=false) {
         let sigstart = 0;
         let end = false;
         let endindex = 0;
+        let isInteger = true;
 
         for (let i = 0; i < numarr.length; i++) {
 
@@ -892,6 +913,7 @@ function round(num, prec, dp=false) {
             }
             else if (numarr[i] === ".") {
                 newnum.push(".");
+                isInteger = false;
             }
             else {
                 newnum.push("0");
@@ -903,31 +925,37 @@ function round(num, prec, dp=false) {
             }
         }
 
-        newnum.push("0");
-        numarr.push("0");
-        if (parseInt(numarr[endindex + 1]) >= 5 && newnum[endindex] !== "9") {
-            newnum[endindex] = parseInt(numarr[endindex]) + 1;
-        }
-        else if (parseInt(numarr[endindex + 1]) >= 5 && newnum[endindex] === "9") {
-            let x = 0
-            while (x < endindex && newnum[endindex - x] === "9") {
-                x++;
-                newnum[endindex - x + 1] = "0";
-                if (newnum[endindex - x] !== ".") {
-                    newnum[endindex - x] = (parseInt(numarr[endindex - 1]) + 1).toString();
+        if (end) {
+            if (endindex >= numarr.length-1) {
+                if (isInteger) {
+                    newnum.push(".");
+                    numarr.push(".");
                 }
-                else if (newnum[endindex - x - 1] !== ".") {
-                    x++;
-                    newnum[endindex - x] = (parseInt(numarr[endindex - x]) + 1).toString();
-                }
+                newnum.push("0");
+                numarr.push("0");
             }
-            if (x == endindex) {
-                newnum[0] = "10";
+            if (parseInt(numarr[endindex + 1]) >= 5 && newnum[endindex] !== "9") {
+                newnum[endindex] = (parseInt(numarr[endindex]) + 1).toString();
+            }
+            else if (parseInt(numarr[endindex + 1]) >= 5 && newnum[endindex] === "9") {
+                let x = 0
+                while (x < endindex && newnum[endindex - x] === "9") {
+                    x++;
+                    newnum[endindex - x + 1] = "0";
+                    if (newnum[endindex - x] !== ".") {
+                        newnum[endindex - x] = (parseInt(numarr[endindex - 1]) + 1).toString();
+                    }
+                    else if (newnum[endindex - x - 1] !== ".") {
+                        x++;
+                        newnum[endindex - x] = (parseInt(numarr[endindex - x]) + 1).toString();
+                    }
+                }
+                if (x == endindex) {
+                    newnum[0] = "10";
+                }
             }
         }
 
         return parseFloat(newnum.join(''));
     }
 }
-
-//console.log(LCM([3, 2, 2]));
