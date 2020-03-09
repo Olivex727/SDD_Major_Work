@@ -32,6 +32,8 @@ The constants are kept to 4 significant figures (i.e. Ideal Gas Constant). For o
 
 ## GUI Help
 
+This section is currently empty as a GUI has not been developed yet
+
 ## Reactions
 
 The reaction button contains most of the mahic of the program. The way it works is in a few simple steps:
@@ -62,3 +64,16 @@ Current Version - 0.2.4
 3/12/2019 - Completed Phase 1
 
 20/2/2020 - Completed Phase 2A
+
+## Future Versions
+
+0.2.5 - Add the autoformulate functions
+0.2.6 - Finalise the react() function
+
+0.3 - Add the initial GUI Elements
+0.4 - Test and maintain the code, finalize
+
+1.0 - Finalize the code
+1.1 - Implement the Equilibrium system
+1.2 - Implement the Acid/Base system
+1.3 - Implement other ideas if time allows
