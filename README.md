@@ -1,13 +1,13 @@
 # SDD_Major_Work
 Here is my Software Major Project - A chemical reaction simulator
 
-# User Manual
+## User Manual
 
-## Basic Information
+### Basic Information
 
 The Reactit! Calculator's goal is to provide an easier way of calculating basic chemical reactions for high school and university students. It will require prior knowlege to be able to operate, hence the target audience, however, it can help individual learning especially for those in Years 10 and 11. A majority of the reactions as well as the information accesible from the program will be geared towards New South Wales Preliminary/HSC Chemistry.
 
-## Anticipated FAQs
+### Anticipated FAQs
 
 These are most likely the questions that could be frequenty asked when figuring out problems and issues with this program.
 
@@ -30,11 +30,11 @@ We use metric units only because this is a scientific tool. And this has been de
 
 The constants are kept to 4 significant figures (i.e. Ideal Gas Constant). For other information pertaining to individual chemicals, it can vary depending on what can be dug up online.
 
-## GUI Help
+### GUI Help
 
 This section is currently empty as a GUI has not been developed yet
 
-## Reactions
+### Reactions
 
 The reaction button contains most of the mahic of the program. The way it works is in a few simple steps:
 
@@ -44,20 +44,20 @@ The reaction button contains most of the mahic of the program. The way it works 
 4. Calculate any necessary amount values
 5. Extra feature values such as equilibria or acid/base
 
-## Extra Features
+### Extra Features
 
 Planned Extra features:
 - Equilibrium reactions
 - Further orgainic molecule reactions
 - Acid/Base reactions
 
-# History
+## History
 
-## Version No.
+### Version No.
 
 Current Version - 0.2.4
 
-## Major developments
+### Major developments
 
 24/11/2019 - Begun Work on project (Phase 1)
 
@@ -65,7 +65,7 @@ Current Version - 0.2.4
 
 20/2/2020 - Completed Phase 2A
 
-## Future Versions
+### Future Versions
 
 0.2.5 - Add the autoformulate functions
 0.2.6 - Finalise the react() function
