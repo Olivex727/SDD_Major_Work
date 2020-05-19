@@ -18,14 +18,27 @@ let reactdict = {};
 
 //The chemical class stores information on the individial chemical identities
 class chemical {
-    constructor(formula, name, type, ion=0) {
-        this.formula = formula; this.name = name, this.type = type; this.ion = ion;
+    constructor(formula, name, type, ion=0, state=null) {
+        this.formula = formula; this.name = name, this.type = type; this.ion = ion; this.state = state;
+    }
+
+    //Checks if the chemical is soluble in water
+    isSoluble() {
+        console.log(this.formula);
+
+        if(!this.formula === "H2O") { return true; }
+        else { return false; }
     }
 
     //Search for the chemicals's tempurature-based attributes
     getDriver(driver) {
         //Get Melting point (m), Boiling point (b), Temurature (t), Enthalpy (h), Entropy (s)
-        return driverdict[this.formula][driver];
+        if (driverdict[this.formula] != null) {
+            return driverdict[this.formula][driver];
+        }
+        else {
+            return null;
+        }
     }
 
     //Get the molar mass of the chemical
@@ -120,13 +133,13 @@ class chemical {
     }
 }
 
-let salt1 = new chemical("(NH4)2NO3", "Ammonium Sulfate", "salt", 0);
-let inmol1 = new chemical("H2O", "Water", "water", 0);
+let salt1 = new chemical("(NH4)2SO3", "Ammonium Sulfate", "salt", 0, "s");
+let inmol1 = new chemical("H2O", "Water", "water", 0, "l");
 
 //Formula class is where all of the main reaction stuff is handled
 class formula {
-    constructor(eq, reactants=[[], [], [], []], conditions=[]) {
-        this.reactants = reactants; //Array of 3-size arrays [chemical, Ratio, Amount, Units]
+    constructor(eq, reactants=[[], [], [], [], []], conditions=[]) {
+        this.reactants = reactants; //Array of 3-size arrays [chemical, Ratio, Amount, Units, State]
         this.conditions = conditions; //Tempurature, Pressure etc.
         this.isDynamic = eq; //Static or Dynamic
         this.excess = [[], [], []] //Excess unreacted chemicals [chemical, amount, units]
@@ -151,6 +164,7 @@ class formula {
 
         console.log(reactdict);
         let type = this.getReactionType();
+        this.type = type;
         console.log(type);
         this.formulateProducts(type);
         console.log(this.products);
@@ -214,6 +228,7 @@ class formula {
         */
 
         //STUB -- REMOVE ONCE GUI IS IMPLEMENTED
+        /*
         this.reactants.push([]);
         this.reactants.push([]);
         this.reactants.push([]);
@@ -222,6 +237,7 @@ class formula {
             this.reactants[2][c] = 0;
             this.reactants[3][c] = "mol";
         }
+        */
 
         //Finds the smallest element amount in the set
         const findSmallest = (set, ignore) => {
@@ -504,7 +520,7 @@ class formula {
             console.log("ITERATION: " + iteration);
 
             //After 10000 recycles, it is clear that the reaction won't work and the program will not calculate
-            if (iteration >= 10000) {
+            if (iteration >= 1) {
                 alert("The reaction could not be calculated. Make sure your inputs are valid or to look up the set of valid reactions in the User Manual");
                 complete = false;
                 break;
@@ -585,19 +601,22 @@ class formula {
                     }
                 }
                 if (checkreact) {
-                    type.push(reactdict[r].name);
+                    type.push(reactdict[r].id);
                 }
             }
-            else if (reactdict[r].base === "formula") {
+            
+            if (reactdict[r].base === "formula") {
                 let rsplit = r.split("+");
                 let checkreact = true;
                 for (let c in rsplit) {
+                    console.log(this.getId(true), rsplit[c]);
+                    console.log(this.getId(true).includes(rsplit[c]));
                     if (!this.getId(true).includes(rsplit[c])) {
                         checkreact = false;
                     }
                 }
-                if (checkreact && reactdict[r].std) {
-                    type.push(r);
+                if (checkreact) {
+                    type.push(reactdict[r].id);
                 }
             }
         }
@@ -620,7 +639,7 @@ class formula {
         this.products[3] = ["mol", "mol", "g"];
 
         //Tempurature, Pressure, Volume of Water
-        this.conditions = [[298.15, 100, 10], ["K", "kPa", "L"]];
+        this.conditions = [[25, 100, 10], ["C", "KPa", "L"]];
         //END STUB
 
         let newreact = [];
@@ -663,7 +682,7 @@ class formula {
     }
 
     //Converts unit amounts into others
-    convertUnits(chem, val, oldu, newu) {
+    convertUnits(chem, val, oldu, newu, returnnewcons=false) {
         let newval = 0;
         let newcons = [];
         
@@ -671,7 +690,7 @@ class formula {
         //===Convert Conditions to Kelvins/Pascals===//
         //Celsius
         if (this.conditions[1][0].includes("C")) {
-            newcons[0] = this.conditions[0][0] - 273.15;
+            newcons[0] = this.conditions[0][0] + 273.15;
         }
         //Kelvin
         else {
@@ -697,11 +716,15 @@ class formula {
         }
 
         //Litres
-        newcons[2] *= this.conditions[0][2];
+        newcons[2] = this.conditions[0][2];
         if (this.conditions[1][2].includes("m")) {
             newcons[2] *= 1 / 1000;
         } else if (this.conditions[1][2].includes("K")) {
             newcons[2] *= 1000;
+        }
+
+        if (returnnewcons) {
+            return newcons;
         }
 
         //===Convert to moles===//
@@ -819,6 +842,63 @@ class formula {
         this.products[1].push(1);
         this.products[2].push(0);
         this.products[3].push("mol");
+    }
+
+    //Gets and Returns the state of any chemicals in the reaction
+    getState(chem, react) {
+        
+        if (react && chem.state != null) {
+            return chem.state;
+        }
+
+        let conds = this.convertUnits(null, null, null, "K", true);
+        let state = "";
+        if (chem.getDriver('mp') == null || chem.getDriver('bp') == null) {
+            state = null;
+            let aqflag = false;
+            for (let c in this.reactants[4]) {
+                if (this.reactants[4][c] === "aq") {
+                    aqflag = true;
+                }
+            }
+            if (aqflag) {
+                if (chem.isSoluble()) {
+                    state = "aq";
+                }
+                else {
+                    if (chem.getDriver('bp') < conds[0]) {
+                        state = "g";
+                    }
+                    else {
+                        state = "s";
+                    }
+                }
+            }
+            else {
+                if (chem.getDriver('bp') < conds[0]) {
+                    state = "g";
+                } else {
+                    state = "s";
+                }
+            }
+        }
+        else if (chem.getDriver('mp') < conds[0] && conds[0] < chem.getDriver('bp')) {
+            state = "l";
+        }
+        else if (chem.getDriver('mp') > conds[0]) {
+            state = "s";
+        }
+        else if (chem.getDriver('bp') < conds[0]) {
+            state = "g";
+        }
+        if (this.type == "combustion" && chem.formula == "H2O") {
+            state = "g";
+        }
+        else if (parseInt(chem.getDriver('ion')) != 0) {
+            chem.ion = parseInt(chem.getDriver('ion'));
+            state = "aq";
+        }
+        return state;
     }
 }
 
