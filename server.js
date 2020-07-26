@@ -36,8 +36,10 @@ app.get('/algo', function (req, res) {
 });
 
 //Send the styling script
-app.get('/css', function (req, res) {
-    res.sendfile("webpage/style.css");
+app.get('/css.css', function (req, res) {
+    console.log("css");
+    const page = fs.readFileSync("public/style.css", 'utf8');
+    res.send(page);
 });
 
 app.get('/file', function (req, res) {

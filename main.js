@@ -3,11 +3,13 @@
 console.log("BEGIN PROGRAM");
 
 function getFiles(input) {
+    
     return $.ajax({
         type: "GET",
         url: "/file?name="+input,
         async : false
     }).responseText.split("\n");
+
 }
 
 //Upload the element information
@@ -101,7 +103,7 @@ eq1 = new formula(false, [
     [1, 1],
     [1, 1],
     ["mol", "mol"],
-    ["aq", "l"]
+    ["s", "l"]
 ]);
 eq2 = new formula(false, [
     [omol, inmol2],
@@ -146,7 +148,15 @@ function displayReact(equation) {
             //console.log(string.join(""));
             //console.log(equation.getState(set[0][n], true));
 
-            string = string.join("") + "\\ _{(" + equation.getState(set[0][n], true) + ")}";
+            let state = "poo";
+            if (set[4][n] == null) {
+                state = equation.getState(set[0][n], true);
+            }
+            else {
+                state = set[4][n];
+            }
+
+            string = string.join("") + "\\ _{(" + state + ")}";
 
             let tempion = Math.abs(set[0][n].ion);
             if (tempion == 1){tempion = "";}
@@ -173,4 +183,88 @@ function displayReact(equation) {
     display += "\\)";
     return display;
     //console.log(display);
+}
+
+let oldConditionUnits = [];
+
+//Checks if the conditions are not negative, stores values in case of onchange event
+function ConditionCheck() {
+    let set = ["pressure", "temp", "vol", "chem"]
+    let element_n = null; let element_u = null;
+    for (let c in set) {
+        s = set[c];
+        element_n = document.getElementById(s + "_n");
+        element_u = document.getElementById(s + "_u");
+        //console.log(element_n.value);
+        if (parseFloat(element_n.value) <= 0) {
+            if (element_u.value != "C" || parseFloat(element_n.value) <= -273.15) {
+                element_n.value = 1;
+            }
+        }
+        oldConditionUnits[c] = element_u.value;
+    }
+}
+
+//Activated after the onchange event for all of the unit selections
+function ChangeUnits() {
+    alert(oldConditionUnits);
+    let set = ["pressure", "temp", "vol", "chem"];
+    //alert(oldConditionUnits[1]);
+    for (let c in set) {
+        if (document.getElementById(set[c] + "_u").value !== oldConditionUnits[c]){
+            document.getElementById(set[c] + "_n").value =
+            onlyConditionUnits(
+                [parseFloat(document.getElementById(set[c] + "_n").value), oldConditionUnits[c]],
+                [1, document.getElementById(set[c] + "_u").value]
+            );
+        }
+    }
+    
+}
+
+//Converts units without the need for a seperate reaction object
+function onlyConditionUnits(oldconds, newconds) {
+    //Parameter: Array [Values, Units]
+    newconds[0] = oldconds[0];
+
+    //===Change Units oldconds are in===//
+    //Celsius
+    if (oldconds[1].includes("C")) {
+        newconds[0] = oldconds[0] + 273.15; //Ignore 273.14999999 ....
+    }
+    //Kelvin
+    else if (oldconds[1] === "K") {
+        newconds[0] = oldconds[0] - 273.15;
+    }
+
+    //Pascals
+    if (oldconds[1].includes("Pa")) {
+        newconds[0] = oldconds[0];
+    }
+    //Atmospheres
+    else if (oldconds[1].includes("atm")) {
+        newconds[0] = oldconds[0] * 101325;
+    }
+
+    //Litres
+    //Nothing, since the only conversions are from mL -> L -> KL
+
+    //Convert to basic units
+    if (oldconds[1].includes("m") && !oldconds[1].includes("atm")) {
+        newconds[0] *= 1 / 1000;
+    } else if (oldconds[1].includes("K") && oldconds[1].length > 1) {
+        newconds[0] *= 1000;
+    }
+
+    //Convert Pressures/Volumes into new units
+    if (newconds[1].includes("m") && !newconds[1].includes("atm")) {
+        newconds[0] *= 1000;
+    } else if (newconds[1].includes("K") && newconds[1].length > 1) {
+        newconds[0] *= (1 / 1000);
+    }
+    if (newconds[1].includes("atm")) {
+        newconds[0] *= (1 / 101325);
+    }
+
+    return newconds[0];
 }
