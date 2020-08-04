@@ -127,7 +127,7 @@ console.log(eq2.getId(false));
 console.log(eq2.getId(true));
 */
 
-eq1.react();
+//eq1.react();
 //eq2.react();
 output.innerText = displayReact(eq1);
 
