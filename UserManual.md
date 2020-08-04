@@ -18,7 +18,7 @@ In order to install the software:
 
 *You can also drag and drop the folder icon (appearing at the top of the bar) on finder into the terminal of the file's location into terminal - this requires that the finder window be displaying the contents of the zip file.*
 
-![filepath.png](./public/user_manual/filepath.png)
+![filepath.png](./public/user_manual/Filepath.png)
 
 ## Processes
 
