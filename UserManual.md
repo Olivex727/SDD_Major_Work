@@ -16,7 +16,7 @@ In order to install the software:
 4. Go to the URL in a **Chrome Browser**: localhost:8000
 
 *You can also drag and drop the folder icon (appearing at the top of the bar) on finder into the terminal of the file's location into terminal - this requires that the finder window be displaying the contents of the zip file.
-![./public/user_manual/filepath.png]()
+![./public/user_manual/filepath.png](./public/user_manual/filepath.png)
 
 ## Processes
 
