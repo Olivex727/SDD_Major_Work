@@ -8,6 +8,7 @@ The Reactit! Calculator's goal is to provide an easier way of calculating basic 
 
 In order to install the software:
 1. Download this GitHub Repository as a zip file. And move the file to the desired folder.
+![ZipDwnld.png](./public/user_manual/ZipDwnld.png)
 2. Open the zip file.
 3. Open a terminal window and enter the following commands, filling in the square brackets with the information about the zip file:
 - cd [File location*]
@@ -15,8 +16,9 @@ In order to install the software:
 - npm start
 4. Go to the URL in a **Chrome Browser**: localhost:8000
 
-*You can also drag and drop the folder icon (appearing at the top of the bar) on finder into the terminal of the file's location into terminal - this requires that the finder window be displaying the contents of the zip file.
-![./public/user_manual/filepath.png](./public/user_manual/filepath.png)
+*You can also drag and drop the folder icon (appearing at the top of the bar) on finder into the terminal of the file's location into terminal - this requires that the finder window be displaying the contents of the zip file.*
+
+![filepath.png](./public/user_manual/filepath.png)
 
 ## Processes
 
