@@ -127,15 +127,26 @@ console.log(eq2.getId(false));
 console.log(eq2.getId(true));
 */
 
-//eq1.react();
-//eq2.react();
-output.innerText = displayReact(eq1);
+const condset = ["pressure", "temp", "vol", "chem"];
+
+let oldConditionUnits = [];
+
+output.innerText = displayReact(eq1, false);
+
+function react() {
+    addConditions(eq1);
+    console.log(eq1.conditions)
+
+    eq1.react();
+    //eq2.react();
+    output.innerText = displayReact(eq1, true);
+}
 
 
-
-function displayReact(equation) {
+function displayReact(equation, displayproducts) {
     //let equation = new formula();
     let display = "\\(";
+    console.log(equation)
     const formLaTex = (set) => {
         for (let n in set[0]) {
             let string = set[0][n].formula.split("");
@@ -148,7 +159,7 @@ function displayReact(equation) {
             //console.log(string.join(""));
             //console.log(equation.getState(set[0][n], true));
 
-            let state = "poo";
+            let state = "";
             if (set[4][n] == null) {
                 state = equation.getState(set[0][n], true);
             }
@@ -164,35 +175,38 @@ function displayReact(equation) {
             if (set[0][n].ion < 0) { string += "^{-" + tempion + "}"; }
             else if (set[0][n].ion > 0) { string += "^{+" + tempion + "}"; }
 
-            display += string + "+";
+            let ratio = "";
+            if (set[1][n] > 1) { ratio = set[1][n]; }
+
+            display += ratio + string + "+";
 
             //output.innerText = "\\("+string+"\\)";
             //display += equation.reactants[0][c] + equation.reactants[0][c]
         }
     }
+
     formLaTex(equation.reactants);
     display = display.split(""); display.pop(); display = display.join("");
-    if (!equation.isDynamic) {
-        display += "\\rightarrow ";
-    } else {
-        display += "\\leftrightharpoons ";
+    if (displayproducts){
+        if (!equation.isDynamic) {
+            display += "\\rightarrow ";
+        } else {
+            display += "\\leftrightharpoons ";
+        }
+
+        formLaTex(equation.products);
+        display = display.split(""); display.pop(); display = display.join("");
     }
-    formLaTex(equation.products);
-    display = display.split(""); display.pop(); display = display.join("");
-    
     display += "\\)";
     return display;
     //console.log(display);
 }
 
-let oldConditionUnits = [];
-
 //Checks if the conditions are not negative, stores values in case of onchange event
 function ConditionCheck() {
-    let set = ["pressure", "temp", "vol", "chem"]
     let element_n = null; let element_u = null;
-    for (let c in set) {
-        s = set[c];
+    for (let c in condset) {
+        s = condset[c];
         element_n = document.getElementById(s + "_n");
         element_u = document.getElementById(s + "_u");
         //console.log(element_n.value);
@@ -203,22 +217,30 @@ function ConditionCheck() {
         }
         oldConditionUnits[c] = element_u.value;
     }
+
+    console.log(oldConditionUnits);
 }
 
 //Activated after the onchange event for all of the unit selections
 function ChangeUnits() {
     alert(oldConditionUnits);
-    let set = ["pressure", "temp", "vol", "chem"];
     //alert(oldConditionUnits[1]);
-    for (let c in set) {
-        if (document.getElementById(set[c] + "_u").value !== oldConditionUnits[c]){
-            document.getElementById(set[c] + "_n").value =
-            onlyConditionUnits(
-                [parseFloat(document.getElementById(set[c] + "_n").value), oldConditionUnits[c]],
-                [1, document.getElementById(set[c] + "_u").value]
-            );
+    for (let c in condset) {
+        if (document.getElementById(condset[c] + "_u").value !== oldConditionUnits[c]) {
+            console.log(true);
+            if (
+                (document.getElementById(condset[c] + "_u").value.includes('L') && oldConditionUnits[c].includes('L')) ||
+                (document.getElementById(condset[c] + "_u").value.includes('g') && oldConditionUnits[c].includes('g'))
+            ) {
+                document.getElementById(condset[c] + "_n").value =
+                onlyConditionUnits(
+                    [parseFloat(document.getElementById(condset[c] + "_n").value), oldConditionUnits[c]],
+                    [1, document.getElementById(condset[c] + "_u").value]
+                );
+            }
         }
     }
+    console.log(oldConditionUnits);
     
 }
 
@@ -246,7 +268,7 @@ function onlyConditionUnits(oldconds, newconds) {
         newconds[0] = oldconds[0] * 101325;
     }
 
-    //Litres
+    //Capacity/Mass
     //Nothing, since the only conversions are from mL -> L -> KL
 
     //Convert to basic units
@@ -254,6 +276,8 @@ function onlyConditionUnits(oldconds, newconds) {
         newconds[0] *= 1 / 1000;
     } else if (oldconds[1].includes("K") && oldconds[1].length > 1) {
         newconds[0] *= 1000;
+    } else if (oldconds[1].includes("µ") && oldconds[1].length > 1) {
+        newconds[0] *= 1/ 1000000;
     }
 
     //Convert Pressures/Volumes into new units
@@ -261,10 +285,23 @@ function onlyConditionUnits(oldconds, newconds) {
         newconds[0] *= 1000;
     } else if (newconds[1].includes("K") && newconds[1].length > 1) {
         newconds[0] *= (1 / 1000);
+    } else if (newconds[1].includes("µ") && oldconds[1].length > 1) {
+        newconds[0] *= 1000000;
     }
+
     if (newconds[1].includes("atm")) {
         newconds[0] *= (1 / 101325);
     }
 
     return newconds[0];
+}
+
+//Adds all of the conditions to the reaction
+function addConditions(equation) {
+    equation.conditions[1] = ["C", "KPa", "L"]; //oldConditionUnits;
+
+    for (let c in condset) {
+        equation.conditions[0][c] = document.getElementById(condset[c] + "_n").value
+        if (c >= 2) { break; }
+    }
 }

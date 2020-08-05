@@ -81,7 +81,7 @@
             <div onclick="ConditionCheck()" class="conds">
                 <b>Conditions:</b>
 
-                Tempurature: <input type="number" id="temp_n" value="273.15"></input>
+                Tempurature: <input type="number" id="temp_n" value="298.15"></input>
                 <select id="temp_u" onchange="ChangeUnits();">
                     <option value="K">K</option>
                     <option value="C">C</option>
@@ -105,6 +105,10 @@
             <div id="output">
                 \( 4CH_{3(g)} + 7O_{2(g)} \rightarrow 6H_{2}O_{(g)} + 4CO_{2(g) }\)
             </div>
+            <div id="lower_bar">
+                <button onclick="react();">React</button>
+                <button onclick="click();">Delete</button>
+            </div>
             <!--
             <p>
                 \( Cl^-_{(aq)} + Na^+_{(aq)} \leftrightharpoons NaCl_{(s)} \) Lol
@@ -117,18 +121,20 @@
             <div id="searchout">
                 \( CH_{3}COO_{(aq)}^{-}\)
             </div>
-            <input type="number" id="chem_n" value="1"></input>
-            <select id="chem_u" value="mol" onchange="ChangeUnits();">
-                <option value="mol">mol</option>
-                <option value="M">M</option>
-                <option value="Kg">Kg</option>
-                <option value="g">g</option>
-                <option value="mg">mg</option>
-                <option value="µg">µg</option>
-                <option value="KL">KL</option>
-                <option value="L">L</option>
-                <option value="mL">mL</option>
-            </select>
+            <div onclick="ConditionCheck()">
+                <input type="number" id="chem_n" value="1"></input>
+                <select id="chem_u" value="mol" onchange="ChangeUnits();">
+                    <option value="mol">mol</option>
+                    <option value="M">M</option>
+                    <option value="Kg">Kg</option>
+                    <option value="g">g</option>
+                    <option value="mg">mg</option>
+                    <option value="µg">µg</option>
+                    <option value="KL">KL</option>
+                    <option value="L">L</option>
+                    <option value="mL">mL</option>
+                </select>
+            </div>
         </div>
         
         <div class="extra">

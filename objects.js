@@ -138,13 +138,13 @@ let inmol1 = new chemical("H2O", "Water", "water", 0, "l");
 
 //Formula class is where all of the main reaction stuff is handled
 class formula {
-    constructor(eq, reactants=[[], [], [], [], []], conditions=[]) {
+    constructor(eq, reactants=[[], [], [], [], []], conditions=[[], []]) {
         this.reactants = reactants; //Array of 3-size arrays [chemical, Ratio, Amount, Units, State]
         this.conditions = conditions; //Tempurature, Pressure etc.
         this.isDynamic = eq; //Static or Dynamic
         this.excess = [[], [], []] //Excess unreacted chemicals [chemical, amount, units]
 
-        this.products = [[], [], [], []];
+        this.products = [[], [], [], [], []];
         this.equilibrum = this.getEq();
     }
 
@@ -177,10 +177,11 @@ class formula {
     formulateProducts(type) {
         if (!type.includes("none")) {
             for (let i in type) {
+                //Go through every item in the reaction, seach through reactdict, and add the products to the list
                 let item = type[i];
                 for (let r in reactdict) {
-                    if (reactdict[r].name === item) {
-                        console.log(item);
+                    if (reactdict[r].id == item) {
+                        //console.log(item);
                         //Once a formula is found, it will not matter if it's special or standard
                         type.splice(type.indexOf(item), 1)
                         if (!reactdict[r].std) {
@@ -520,8 +521,8 @@ class formula {
             console.log("ITERATION: " + iteration);
 
             //After 10000 recycles, it is clear that the reaction won't work and the program will not calculate
-            if (iteration >= 1) {
-                //alert("The reaction could not be calculated. Make sure your inputs are valid or to look up the set of valid reactions in the User Manual");
+            if (iteration >= 1000) {
+                alert("The reaction could not be calculated. Make sure your inputs are valid or to look up the set of valid reactions in the User Manual");
                 complete = false;
                 break;
             }
@@ -605,12 +606,14 @@ class formula {
                 }
             }
             
+            //CHECK FOR WTF
             if (reactdict[r].base === "formula") {
                 let rsplit = r.split("+");
                 let checkreact = true;
                 for (let c in rsplit) {
-                    console.log(this.getId(true), rsplit[c]);
-                    console.log(this.getId(true).includes(rsplit[c]));
+                    //console.log(this.reactants);
+                    //console.log(this.getId(true), rsplit[c]);
+                    //console.log(this.getId(true).includes(rsplit[c]));
                     if (!this.getId(true).includes(rsplit[c])) {
                         checkreact = false;
                     }
@@ -842,6 +845,7 @@ class formula {
         this.products[1].push(1);
         this.products[2].push(0);
         this.products[3].push("mol");
+        this.products[4].push(null);
     }
 
     //Gets and Returns the state of any chemicals in the reaction
