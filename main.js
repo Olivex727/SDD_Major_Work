@@ -81,6 +81,7 @@ window.onload = function () {
  * metal
 */
 
+salt3 = new chemical("NH4NO3", "Ammonium Nitrate", "salt", 0);
 salt2 = new chemical("Ca(NO3)2", "Calcium Nitrate", "salt", 0, "aq");
 ion1 = new chemical("NO3", "Nitrate ion", "ion", -1);
 ion2 = new chemical("PO4", "Phosphate ion", "ion", -3);
@@ -99,7 +100,7 @@ console.log(ion2.getMolarMass());
 //console.log(salt1.getDriver("enthalpy"));
 
 eq1 = new formula(false, [
-    [salt1, inmol1],
+    [salt3, inmol1],
     [1, 1],
     [1, 1],
     ["mol", "mol"],
@@ -133,13 +134,38 @@ let oldConditionUnits = [];
 
 output.innerText = displayReact(eq1, false);
 
-function react() {
+/**/
+addConditions(eq2);
+console.log(eq2.conditions)
+
+eq2.react();
+
+output.innerText = displayReact(eq2, true);
+/*
+ts();
+
+function ts() {
+    output.innerText = "\\(z\\)";
+}
+*/
+
+function reactButton() {
+    eq1.clear();
     addConditions(eq1);
     console.log(eq1.conditions)
 
-    eq1.react();
+    if (!eq1.react()) {
+        alert("The reaction could not be calculated. Make sure your inputs are valid or to look up the set of valid reactions in the User Manual");
+    }
+    else {
+        output.innerText = displayReact(eq1, true);
+    }
     //eq2.react();
-    output.innerText = displayReact(eq1, true);
+    
+}
+
+function deleteButton() {
+
 }
 
 

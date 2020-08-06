@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Olivex727/SDD_Major_Work/issues"
   },
-  "homepage": "https://github.com/Olivex727/SDD_Major_Work#readme"
+  "homepage": "https://github.com/Olivex727/SDD_Major_Work#readme",
+  "dependencies": {
+    "mathjax": "^3.0.5"
+  }
 }

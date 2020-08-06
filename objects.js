@@ -170,6 +170,10 @@ class formula {
         console.log(this.products);
         if (this.equalize()) {
             console.log(this.calculate());
+            return true;
+        }
+        else {
+            return false;
         }
     }
 
@@ -522,7 +526,6 @@ class formula {
 
             //After 10000 recycles, it is clear that the reaction won't work and the program will not calculate
             if (iteration >= 1000) {
-                alert("The reaction could not be calculated. Make sure your inputs are valid or to look up the set of valid reactions in the User Manual");
                 complete = false;
                 break;
             }
@@ -903,6 +906,12 @@ class formula {
             state = "aq";
         }
         return state;
+    }
+
+    clear() {
+        this.products = [[], [], [], [], []];
+        this.conditions = [[], []];
+        this.equilibrum = this.getEq();
     }
 }
 
