@@ -138,7 +138,7 @@ let inmol1 = new chemical("H2O", "Water", "water", 0, "l");
 
 //Formula class is where all of the main reaction stuff is handled
 class formula {
-    constructor(eq, reactants=[[], [], [], [], []], conditions=[[], []]) {
+    constructor(eq=false, reactants=[[], [], [], [], []], conditions=[[], []]) {
         this.reactants = reactants; //Array of 3-size arrays [chemical, Ratio, Amount, Units, State]
         this.conditions = conditions; //Tempurature, Pressure etc.
         this.isDynamic = eq; //Static or Dynamic

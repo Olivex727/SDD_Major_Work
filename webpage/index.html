@@ -15,9 +15,13 @@
         </script>
         <!--<link rel="stylesheet" href="./sty.css">-->
         <style>
+            body{
+                background-color: lightblue;
+                font-family: 'Work Sans', sans-serif;
+            }
 
             #title {
-                font-family: 'Work Sans', sans-serif;
+                /*font-family: 'Work Sans', sans-serif;*/
                 /*color: yellow;*/
                 margin: 20px;
             }
@@ -32,10 +36,10 @@
             }
 
             .intf {
-                font-family: 'Work Sans', sans-serif;
+                /*font-family: 'Work Sans', sans-serif;*/
                 display: inline;
                 margin: 120px;
-                margin-top: 2px;
+                /*margin-top: 2px;*/
             }
 
             .conds {
@@ -45,6 +49,7 @@
             .intf #output {
                 margin: 120px;
                 margin-top: 2px;
+                margin-bottom: 2px;
                 padding: 10px;
                 width: 700px;
                 border-style: solid;
@@ -57,10 +62,27 @@
                 width: 60px;
             }
 
+            .intf #lower_bar button {
+                display: inline;
+                background-color: aquamarine;
+                padding: 8px;
+                padding-top: 4px;
+                padding-bottom: 4px;
+                border-radius: 10px;
+                font-size: 20px;
+            }
+
+            #lower_bar {
+                margin: 120px;
+                margin-top: 10px;
+                margin-right: 2px;
+                margin-bottom: 0px;
+            }
+
             .search {
                 position: relative;
                 left: 1000px;
-                bottom: 185px; /*205px;*/
+                bottom: 146px;/*256px;/*185px; /*205px;*/
             }
 
             .search input {
@@ -68,9 +90,54 @@
                 height: 25px;
             }
 
-            body{
-                background-color: lightblue;
+            .extra {
+                border: 1px solid black;
+                width: 100%;
+                height: 350px;
+                margin-top: 0px;
             }
+            
+            .extra h3 {
+                margin-left: 120px;
+            }
+            /*
+            .extra span {
+                margin-left: 120px;
+            }
+            */
+            .extra div {
+                display: inline;
+            }
+            
+            .extra #results_reactants {
+                margin-left: 120px;
+                display: inline;
+            }
+
+            .extra #results_reactants * {
+                display: block;
+            }
+
+            .extra #results_products {
+                margin-left: 360px;
+                display: inline;
+            }
+
+            .extra #results_products * {
+                display: block;
+            }
+
+            .extra li {
+                display: block;
+                list-style-type: none;
+                margin-bottom: 10px;
+            }
+
+            #displayelement {
+                visibility: hidden;
+                display: none;
+            }
+            
         </style>
     </head>
     <body>
@@ -106,8 +173,8 @@
                 \( 4CH_{3(g)} + 7O_{2(g)} \rightarrow 6H_{2}O_{(g)} + 4CO_{2(g) }\)
             </div>
             <div id="lower_bar">
-                <button onclick="reactButton();">React</button>
-                <button onclick="deleteButton();">Delete</button>
+                <button id="react" onmouseleave="changeButtonColor(this, falie)" onmouseover="changeButtonColor(this)" onclick="reactButton();"><b>React</b></button>
+                <button id="delete" onmouseleave="changeButtonColor(this, falie)" onmouseover="changeButtonColor(this)" onclick="deleteButton();"><b>Delete</b></button>
             </div>
             <!--
             <p>
@@ -117,7 +184,7 @@
             
         </div>
         <div class="search">
-            <input id="search" type="text" placeholder="Search Chemicals...">
+            <input id="search" type="text" placeholder="Search Chemicali...">
             <div id="searchout">
                 \( CH_{3}COO_{(aq)}^{-}\)
             </div>
@@ -138,7 +205,88 @@
         </div>
         
         <div class="extra">
-        
+            <h3>Results</h3>
+            <div class="chemdisplay" id="results_reactants">
+                <p>Reactants:</p>
+                <li>
+                <!-- Below is a standard display element, that javascript will duplicate based on how many chemicali there are -->
+                <span id="chem_t_0">Sodium Chloride</span>:
+                <input type="number" id="chem_n_0" value="1"></input>
+                <select id="chem_u_0" value="mol">
+                    <option value="mol">mol</option>
+                    <option value="M">M</option>
+                    <option value="Kg">Kg</option>
+                    <option value="g">g</option>
+                    <option value="mg">mg</option>
+                    <option value="µg">µg</option>
+                    <option value="KL">KL</option>
+                    <option value="L">L</option>
+                    <option value="mL">mL</option>
+                </select>
+                <span id="chem_t_0">Sodium Chloride</span>:
+                <input type="number" id="chem_n_0" value="1"></input>
+                <select id="chem_u_0" value="mol">
+                    <option value="mol">mol</option>
+                    <option value="M">M</option>
+                    <option value="Kg">Kg</option>
+                    <option value="g">g</option>
+                    <option value="mg">mg</option>
+                    <option value="µg">µg</option>
+                    <option value="KL">KL</option>
+                    <option value="L">L</option>
+                    <option value="mL">mL</option>
+                </select>
+                </li>
+            </div>
+            <div class="chemdisplay" id="results_products">
+                <p>Products:</p>
+                <li>
+                <!-- Below is a standard display element, that javascript will duplicate based on how many chemicali there are -->
+                <span id="chem_t_0">Sodium Chloride</span>:
+                <input type="number" id="chem_n_0" value="1"></input>
+                <select id="chem_u_0" value="mol">
+                    <option value="mol">mol</option>
+                    <option value="M">M</option>
+                    <option value="Kg">Kg</option>
+                    <option value="g">g</option>
+                    <option value="mg">mg</option>
+                    <option value="µg">µg</option>
+                    <option value="KL">KL</option>
+                    <option value="L">L</option>
+                    <option value="mL">mL</option>
+                </select>
+                <!-- Below is a standard display element, that javascript will duplicate based on how many chemicali there are -->
+                <span id="chem_t_0">Sodium Chloride</span>:
+                <input type="number" id="chem_n_0" value="1"></input>
+                <select id="chem_u_0" value="mol">
+                    <option value="mol">mol</option>
+                    <option value="M">M</option>
+                    <option value="Kg">Kg</option>
+                    <option value="g">g</option>
+                    <option value="mg">mg</option>
+                    <option value="µg">µg</option>
+                    <option value="KL">KL</option>
+                    <option value="L">L</option>
+                    <option value="mL">mL</option>
+                </select>
+                </li>
+            </div>
+            <!-- Below is a standard display element, that javascript will duplicate based on how many chemicali there are -->
+            <div id="displayelement">
+                <span id="chem_t_0">Sodium Chloride</span>:
+                <input type="number" id="chem_n_0" value="1"></input>
+                <select id="chem_u_0" value="mol">
+                    <option value="mol">mol</option>
+                    <option value="M">M</option>
+                    <option value="Kg">Kg</option>
+                    <option value="g">g</option>
+                    <option value="mg">mg</option>
+                    <option value="µg">µg</option>
+                    <option value="KL">KL</option>
+                    <option value="L">L</option>
+                    <option value="mL">mL</option>
+                </select>
+            </div>
         </div>
     </body>
 

@@ -65,6 +65,15 @@ window.onload = function () {
     
 }
 
+//=======COSMETICS=======//
+
+function changeButtonColor(obj, onobj=true){
+    let element = document.getElementById(obj.id);
+    let color = "#477862";
+    if (!onobj) { color = "aquamarine"; }
+    element.style.backgroundColor = color;
+}
+
 //Note: Elements will only go as far as Uranium (No. 92) due to radioactivity and inability to properly bond
 
 /*
@@ -100,7 +109,7 @@ console.log(ion2.getMolarMass());
 //console.log(salt1.getDriver("enthalpy"));
 
 eq1 = new formula(false, [
-    [salt2, inmol1],
+    [salt1, inmol1],
     [1, 1],
     [1, 1],
     ["mol", "mol"],
@@ -143,7 +152,7 @@ eq1.react();
 output.innerText = displayReact(eq1, true);
 /*
 ts();
-*/
+
 let tscount = 0;
 
 function ts() {
@@ -154,11 +163,12 @@ function ts() {
 
 //IDEA --- RELOAD PAGE WHEN ACTIVIATING REACT FUNCTION!!
 setInterval(ts, 10000);
+*/
 
 function reactButton() {
     eq1.clear();
     addConditions(eq1);
-    console.log(eq1.conditions)
+    console.log(eq1.conditions);
 
     if (!eq1.react()) {
         alert("The reaction could not be calculated. Make sure your inputs are valid or to look up the set of valid reactions in the User Manual");
@@ -171,9 +181,14 @@ function reactButton() {
 }
 
 function deleteButton() {
-
+    eq1 = new formula();
+    output.style.color = "grey";
+    output.innerText = "Enter Chemicals -->";
 }
 
+function addChemicals() {
+    output.style.color = "black";
+}
 
 function displayReact(equation, displayproducts) {
     //let equation = new formula();
