@@ -100,7 +100,7 @@ console.log(ion2.getMolarMass());
 //console.log(salt1.getDriver("enthalpy"));
 
 eq1 = new formula(false, [
-    [salt3, inmol1],
+    [salt2, inmol1],
     [1, 1],
     [1, 1],
     ["mol", "mol"],
@@ -135,19 +135,25 @@ let oldConditionUnits = [];
 output.innerText = displayReact(eq1, false);
 
 /**/
-addConditions(eq2);
-console.log(eq2.conditions)
+addConditions(eq1);
+console.log(eq1.conditions)
 
-eq2.react();
+eq1.react();
 
-output.innerText = displayReact(eq2, true);
+output.innerText = displayReact(eq1, true);
 /*
 ts();
+*/
+let tscount = 0;
 
 function ts() {
-    output.innerText = "\\(z\\)";
+    console.log("e");
+    tscount++;
+    output.innerText = "\\("+tscount+"\\)";
 }
-*/
+
+//IDEA --- RELOAD PAGE WHEN ACTIVIATING REACT FUNCTION!!
+setInterval(ts, 10000);
 
 function reactButton() {
     eq1.clear();
