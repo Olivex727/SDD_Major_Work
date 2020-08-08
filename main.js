@@ -74,6 +74,17 @@ function changeButtonColor(obj, onobj=true){
     element.style.backgroundColor = color;
 }
 
+function displaySearch(infocus){
+    let searchdiv = document.getElementById('searchout');
+    if (infocus){
+        searchdiv.style.visibility = 'visible';
+        searchdiv.style.display = 'inherit';
+    } else {
+        searchdiv.style.visibility = 'hidden';
+        searchdiv.style.display = 'none';
+    }
+}
+
 //Note: Elements will only go as far as Uranium (No. 92) due to radioactivity and inability to properly bond
 
 /*

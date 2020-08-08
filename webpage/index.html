@@ -90,6 +90,44 @@
                 height: 25px;
             }
 
+            .search #searchout {
+                background-color: white;
+                width: fit-content;
+                padding-left: 10px;
+                margin-left: 5px;
+                padding-right: 10px;
+                margin-top: -1px;
+                font-size: 15px;
+                list-style-type: none;
+
+                border: 1px solid black;
+                visibility: hidden;
+                display: none;
+            }
+
+            .search #searchout li {
+                padding-bottom: 5px;
+                padding-top: 5px;
+            }
+            
+            .addstage {
+                position: relative;
+                left: 1000px;
+                bottom: 120px;
+                /*margin-top: 50px;*/
+            }
+
+            .addstage button {
+                display: block;
+                margin-top: 10px;
+                background-color: aquamarine;
+                padding: 8px;
+                padding-top: 4px;
+                padding-bottom: 4px;
+                border-radius: 10px;
+                font-size: 20px;
+            }
+
             .extra {
                 border: 1px solid black;
                 width: 100%;
@@ -100,37 +138,29 @@
             .extra h3 {
                 margin-left: 120px;
             }
-            /*
-            .extra span {
-                margin-left: 120px;
-            }
-            */
-            .extra div {
-                display: inline;
-            }
             
             .extra #results_reactants {
                 margin-left: 120px;
                 display: inline;
             }
 
-            .extra #results_reactants * {
-                display: block;
-            }
-
             .extra #results_products {
-                margin-left: 360px;
+                position: relative;
+                left: 360px;
+                top: -50px; /*Title moves 31px for each reactant element*/
                 display: inline;
-            }
-
-            .extra #results_products * {
-                display: block;
+                /*margin-left: 360px;*/
             }
 
             .extra li {
                 display: block;
                 list-style-type: none;
                 margin-bottom: 10px;
+                margin-left: 120px;
+            }
+
+            .extra p {
+                margin-left: 120px;
             }
 
             #displayelement {
@@ -173,8 +203,8 @@
                 \( 4CH_{3(g)} + 7O_{2(g)} \rightarrow 6H_{2}O_{(g)} + 4CO_{2(g) }\)
             </div>
             <div id="lower_bar">
-                <button id="react" onmouseleave="changeButtonColor(this, falie)" onmouseover="changeButtonColor(this)" onclick="reactButton();"><b>React</b></button>
-                <button id="delete" onmouseleave="changeButtonColor(this, falie)" onmouseover="changeButtonColor(this)" onclick="deleteButton();"><b>Delete</b></button>
+                <button id="react" onmouseleave="changeButtonColor(this, false)" onmouseover="changeButtonColor(this)" onclick="reactButton();"><b>React</b></button>
+                <button id="delete" onmouseleave="changeButtonColor(this, false)" onmouseover="changeButtonColor(this)" onclick="deleteButton();"><b>Delete</b></button>
             </div>
             <!--
             <p>
@@ -184,78 +214,55 @@
             
         </div>
         <div class="search">
-            <input id="search" type="text" placeholder="Search Chemicali...">
+            <input id="search" type="text" placeholder="Search Chemicals..." onfocus="displaySearch(true);" onfocusout="displaySearch(false);">
             <div id="searchout">
-                \( CH_{3}COO_{(aq)}^{-}\)
+                <li>Acetic Acid <i>CH3COOH</i></li>
+                <li>Sodium Chloride <i>NaOH</i></li><!--\( CH_{3}COO_{(aq)}^{-}\)-->
             </div>
-            <div onclick="ConditionCheck()">
-                <input type="number" id="chem_n" value="1"></input>
-                <select id="chem_u" value="mol" onchange="ChangeUnits();">
-                    <option value="mol">mol</option>
-                    <option value="M">M</option>
-                    <option value="Kg">Kg</option>
-                    <option value="g">g</option>
-                    <option value="mg">mg</option>
-                    <option value="µg">µg</option>
-                    <option value="KL">KL</option>
-                    <option value="L">L</option>
-                    <option value="mL">mL</option>
-                </select>
-            </div>
+            
+        </div>
+        <div class="addstage" onclick="ConditionCheck()">
+            <input type="number" id="chem_n" value="1"></input>
+            <select id="chem_u" value="mol" onchange="ChangeUnits();">
+                <option value="mol">mol</option>
+                <option value="M">M</option>
+                <option value="Kg">Kg</option>
+                <option value="g">g</option>
+                <option value="mg">mg</option>
+                <option value="µg">µg</option>
+                <option value="KL">KL</option>
+                <option value="L">L</option>
+                <option value="mL">mL</option>
+            </select>
+            <button id="Add"><b>Add</b></button>
         </div>
         
         <div class="extra">
             <h3>Results</h3>
             <div class="chemdisplay" id="results_reactants">
                 <p>Reactants:</p>
-                <li>
-                <!-- Below is a standard display element, that javascript will duplicate based on how many chemicali there are -->
-                <span id="chem_t_0">Sodium Chloride</span>:
-                <input type="number" id="chem_n_0" value="1"></input>
-                <select id="chem_u_0" value="mol">
-                    <option value="mol">mol</option>
-                    <option value="M">M</option>
-                    <option value="Kg">Kg</option>
-                    <option value="g">g</option>
-                    <option value="mg">mg</option>
-                    <option value="µg">µg</option>
-                    <option value="KL">KL</option>
-                    <option value="L">L</option>
-                    <option value="mL">mL</option>
-                </select>
-                <span id="chem_t_0">Sodium Chloride</span>:
-                <input type="number" id="chem_n_0" value="1"></input>
-                <select id="chem_u_0" value="mol">
-                    <option value="mol">mol</option>
-                    <option value="M">M</option>
-                    <option value="Kg">Kg</option>
-                    <option value="g">g</option>
-                    <option value="mg">mg</option>
-                    <option value="µg">µg</option>
-                    <option value="KL">KL</option>
-                    <option value="L">L</option>
-                    <option value="mL">mL</option>
-                </select>
-                </li>
             </div>
             <div class="chemdisplay" id="results_products">
                 <p>Products:</p>
                 <li>
-                <!-- Below is a standard display element, that javascript will duplicate based on how many chemicali there are -->
-                <span id="chem_t_0">Sodium Chloride</span>:
-                <input type="number" id="chem_n_0" value="1"></input>
-                <select id="chem_u_0" value="mol">
-                    <option value="mol">mol</option>
-                    <option value="M">M</option>
-                    <option value="Kg">Kg</option>
-                    <option value="g">g</option>
-                    <option value="mg">mg</option>
-                    <option value="µg">µg</option>
-                    <option value="KL">KL</option>
-                    <option value="L">L</option>
-                    <option value="mL">mL</option>
-                </select>
-                <!-- Below is a standard display element, that javascript will duplicate based on how many chemicali there are -->
+                    <span id="chem_t_0">Sodium Chloride</span>:
+                    <input type="number" id="chem_n_0" value="1"></input>
+                    <select id="chem_u_0" value="mol">
+                        <option value="mol">mol</option>
+                        <option value="M">M</option>
+                        <option value="Kg">Kg</option>
+                        <option value="g">g</option>
+                        <option value="mg">mg</option>
+                        <option value="µg">µg</option>
+                        <option value="KL">KL</option>
+                        <option value="L">L</option>
+                        <option value="mL">mL</option>
+                    </select>
+                </li>
+            </div>
+            <!-- Below is a standard display element, that javascript will duplicate based on how many chemicals there are 
+            <div id="displayelement">
+                <li>
                 <span id="chem_t_0">Sodium Chloride</span>:
                 <input type="number" id="chem_n_0" value="1"></input>
                 <select id="chem_u_0" value="mol">
@@ -270,23 +277,7 @@
                     <option value="mL">mL</option>
                 </select>
                 </li>
-            </div>
-            <!-- Below is a standard display element, that javascript will duplicate based on how many chemicali there are -->
-            <div id="displayelement">
-                <span id="chem_t_0">Sodium Chloride</span>:
-                <input type="number" id="chem_n_0" value="1"></input>
-                <select id="chem_u_0" value="mol">
-                    <option value="mol">mol</option>
-                    <option value="M">M</option>
-                    <option value="Kg">Kg</option>
-                    <option value="g">g</option>
-                    <option value="mg">mg</option>
-                    <option value="µg">µg</option>
-                    <option value="KL">KL</option>
-                    <option value="L">L</option>
-                    <option value="mL">mL</option>
-                </select>
-            </div>
+            </div> -->
         </div>
     </body>
 
