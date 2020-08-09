@@ -35,7 +35,7 @@ app.get('/algo', function (req, res) {
     res.send(page);
 });
 
-//Send the styling script
+//Send the styling script - INVALID
 app.get('/css.css', function (req, res) {
     console.log("css");
     const page = fs.readFileSync("public/style.css", 'utf8');
@@ -44,7 +44,7 @@ app.get('/css.css', function (req, res) {
 
 app.get('/file', function (req, res) {
     res.sendfile('public/files/'+req.query.name + '.txt');
-})
+});
 
 //Host to port 8000
 app.listen(8000, function () {

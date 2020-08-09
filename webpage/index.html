@@ -15,6 +15,10 @@
         </script>
         <!--<link rel="stylesheet" href="./sty.css">-->
         <style>
+            #clear {
+                color: transparent;
+            }
+
             body{
                 background-color: lightblue;
                 font-family: 'Work Sans', sans-serif;
@@ -82,7 +86,7 @@
             .search {
                 position: relative;
                 left: 1000px;
-                bottom: 146px;/*256px;/*185px; /*205px;*/
+                bottom: 555px;/*146px;/*256px;/*185px; /*205px;*/
             }
 
             .search input {
@@ -113,7 +117,7 @@
             .addstage {
                 position: relative;
                 left: 1000px;
-                bottom: 120px;
+                bottom: 84px;
                 /*margin-top: 50px;*/
             }
 
@@ -146,7 +150,7 @@
 
             .extra #results_products {
                 position: relative;
-                left: 360px;
+                left: 500px;
                 top: -50px; /*Title moves 31px for each reactant element*/
                 display: inline;
                 /*margin-left: 360px;*/
@@ -193,7 +197,7 @@
                 </select>
 
                 Volume: <input type="number" id="vol_n" value="1"></input>
-                <select id="vol_u" value="L" onchange="ChangeUnits();">
+                <select id="vol_u" value="K" onchange="ChangeUnits();">
                     <option value="L">L</option>
                     <option value="KL">KL</option>
                     <option value="mL">mL</option>
@@ -211,14 +215,6 @@
                 \( Cl^-_{(aq)} + Na^+_{(aq)} \leftrightharpoons NaCl_{(s)} \) Lol
             </p>
             -->
-            
-        </div>
-        <div class="search">
-            <input id="search" type="text" placeholder="Search Chemicals..." onfocus="displaySearch(true);" onfocusout="displaySearch(false);">
-            <div id="searchout">
-                <li>Acetic Acid <i>CH3COOH</i></li>
-                <li>Sodium Chloride <i>NaOH</i></li><!--\( CH_{3}COO_{(aq)}^{-}\)-->
-            </div>
             
         </div>
         <div class="addstage" onclick="ConditionCheck()">
@@ -244,23 +240,8 @@
             </div>
             <div class="chemdisplay" id="results_products">
                 <p>Products:</p>
-                <li>
-                    <span id="chem_t_0">Sodium Chloride</span>:
-                    <input type="number" id="chem_n_0" value="1"></input>
-                    <select id="chem_u_0" value="mol">
-                        <option value="mol">mol</option>
-                        <option value="M">M</option>
-                        <option value="Kg">Kg</option>
-                        <option value="g">g</option>
-                        <option value="mg">mg</option>
-                        <option value="µg">µg</option>
-                        <option value="KL">KL</option>
-                        <option value="L">L</option>
-                        <option value="mL">mL</option>
-                    </select>
-                </li>
             </div>
-            <!-- Below is a standard display element, that javascript will duplicate based on how many chemicals there are 
+            <!-- Below is a standard display element, that javascript will duplicate based on how many chemicals there are -->
             <div id="displayelement">
                 <li>
                 <span id="chem_t_0">Sodium Chloride</span>:
@@ -277,7 +258,18 @@
                     <option value="mL">mL</option>
                 </select>
                 </li>
-            </div> -->
+            </div>
+        </div>
+
+        <div class="search">
+            <input id="search" type="text" placeholder="Search Chemicals..." onfocus="displaySearch(true);"
+                onfocusout="displaySearch(false);" onkeypress="displaySearchResults(this);">
+            <div id="searchout">
+                <li id="CH3COOH">Acetic Acid <i>CH3COOH</i></li>
+                <li id="NaCl">Sodium Chloride <i>NaOH</i></li>
+                <!--\( CH_{3}COO_{(aq)}^{-}\)-->
+            </div>
+            <!--<li id="NaCl">Sodium Chloride <i>NaCl</i></li>-->
         </div>
     </body>
 

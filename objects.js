@@ -190,7 +190,8 @@ class formula {
                         type.splice(type.indexOf(item), 1)
                         if (!reactdict[r].std) {
                             for (let chem in reactdict[r].products.split("+")) {
-                                this.addToReact(reactdict[r].products.split("+")[chem]);
+                                let name = driverdict[reactdict[r].products.split("+")[chem]].name;
+                                this.addToReact(reactdict[r].products.split("+")[chem], null, name);
                             }
                             console.log(this.products);
                         }
@@ -632,20 +633,22 @@ class formula {
 
     //Perform calculations on the reaction
     calculate() {
-        //STUB -- REMOVE WHEN GUI IS IMPLEMENTED
         console.log("Calculate");
-        let precision = 4;
+        let precision = 10;
+        //STUB -- REMOVE WHEN GUI IS IMPLEMENTED
+        /*
         for (let n in this.reactants[2]) {
-            this.reactants[2][n] = round(25 /*Math.random()* 100*/ , precision, true);
+            this.reactants[2][n] = round(25 /*Math.random()* 100 , precision, true);
         }
+        */
         //console.log(this.reactants[2]);
 
-        this.reactants[3][0] = "g";
+        //this.reactants[3][0] = "g";
 
-        this.products[3] = ["mol", "mol", "g"];
+        //this.products[3] = ["mol", "mol", "g"];
 
         //Tempurature, Pressure, Volume of Water
-        this.conditions = [[25, 100, 10], ["C", "KPa", "L"]];
+        //this.conditions = [[25, 100, 10], ["C", "KPa", "L"]];
         //END STUB
 
         let newreact = [];
@@ -674,7 +677,7 @@ class formula {
 
         //Add amount values to the products
         for (let c in this.products[0]) {
-            this.products[2][c] = round(this.convertUnits(this.products[0][c], (this.products[1][c] * basicmol), "mol", this.products[3][c]), precision);
+            this.products[2][c] = round(this.products[1][c] * basicmol, precision) //round(this.convertUnits(this.products[0][c], (this.products[1][c] * basicmol), "mol", this.products[3][c]), precision);
         }
 
         //Add excess chemical information
@@ -854,6 +857,10 @@ class formula {
     //Gets and Returns the state of any chemicals in the reaction
     getState(chem, react) {
         
+        if (chem.getDriver("state") != null && chem.getDriver("state") !== "") {
+            return chem.getDriver("state");
+        }
+
         if (react && chem.state != null) {
             return chem.state;
         }

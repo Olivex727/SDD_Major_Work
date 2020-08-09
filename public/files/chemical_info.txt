@@ -1,6 +1,6 @@
-formula|state|∆H|∆S|MP|BP|∆Vr|Density|ion
-NaCl|aq|-411.12|72|1073.8|1738|0|-1
-H2O|l|0|0|273.15|373.15|0|1|0
-NO3||||||||-1
-SO3||||||||-2
-NH4||||||||1
+formula|state|∆H|∆S|MP|BP|∆Vr|Density|ion|name
+NaCl|aq|-411.12|72|1073.8|1738|0|-1|Sodium Chloride
+H2O|l|0|0|273.15|373.15|0|1|0|Water
+NO3||||||||-1|Nitrate Ion
+SO3||||||||-2|Sulfite Ion
+NH4||||||||1|Ammonium Ion

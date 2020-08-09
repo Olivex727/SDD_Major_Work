@@ -147,4 +147,12 @@ function getMin(array) {
     return [min, index];
 }
 
+console.log(capitalize("lol"));
+
+function capitalize(string) {
+    let x = string.split("");
+    x[0] = x[0].toUpperCase()
+    return x.join('');
+}
+
 console.log("END STANDARD ALGOS");

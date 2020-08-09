@@ -35,7 +35,8 @@ for (let e in pt) {
         bp: parseFloat(elm[5]),
         red_pot: parseFloat(elm[6]),
         density: parseFloat(elm[7]),
-        ion: parseFloat(elm[8])
+        ion: parseFloat(elm[8]),
+        name: elm[9]
     };
 }
 console.log(driverdict);
@@ -122,8 +123,8 @@ console.log(ion2.getMolarMass());
 eq1 = new formula(false, [
     [salt1, inmol1],
     [1, 1],
-    [1, 1],
-    ["mol", "mol"],
+    [2, 1],
+    ["Kg", "mol"],
     ["s", "l"]
 ]);
 eq2 = new formula(false, [
@@ -148,19 +149,16 @@ console.log(eq2.getId(false));
 console.log(eq2.getId(true));
 */
 
-const condset = ["pressure", "temp", "vol", "chem"];
+const condset = ["temp", "pressure" , "vol", "chem"];
+let auxcondset = [];
 
 let oldConditionUnits = [];
 
 output.innerText = displayReact(eq1, false);
 
 /**/
-addConditions(eq1);
-console.log(eq1.conditions)
-
-eq1.react();
-
-output.innerText = displayReact(eq1, true);
+displayResults(eq1.reactants, 'reactants');
+reactButton();
 /*
 ts();
 
@@ -176,7 +174,55 @@ function ts() {
 setInterval(ts, 10000);
 */
 
+function displayResults(set, code) {
+    console.log(code);
+    let results = document.getElementById('results_'+code);
+    let element = document.getElementById('displayelement');
+    const selectiontab = 'value="mol"> <option value = "mol" > mol </option> <option value = "M" > M </option> <option value = "Kg" > Kg </option> <option value = "g" > g </option> <option value = "mg" > mg </option> <option value = "µg" > µg </option> <option value = "KL" > KL </option> <option value = "L" > L </option> <option value = "mL" > mL </option> </select> </li>'
+
+    results.innerHTML = "<p>"+capitalize(code)+":</p>";
+
+    let readOnlyString = "";
+    if (code === 'products') { readOnlyString = " readonly=true";}
+
+    let longest = 0;
+    for (let c in set[0]) {
+        if (set[0][c].name.length > longest) {
+            longest = set[0][c].name.length;
+        }
+    }
+
+    for (let c in set[0]) {
+        let e = element.cloneNode(true);
+
+        e.id = "set_"+code+"_"+c;
+
+        let spaces = "";
+        for (i = 0; i < longest - set[0][c].name.length; i++) { spaces += "_"; }
+        spaces += "_";
+        //console.log(spaces);
+
+        e.innerHTML = '<li> <span id ="chem_t_' + code + "_" + c +
+        '">' + set[0][c].name + '<span id="clear">' + spaces + '</span>' +
+        '</span>: <input type = "number" id = "chem_n_' + code + "_" + c +
+        '" value="1"' + readOnlyString + '> <select id = "chem_u_' + code + "_" + c + '"'
+        + selectiontab;
+
+        results.appendChild(e);
+    }
+
+    let prod = document.getElementById('results_products');
+    prod.style.top = (- 50 - (31 * eq1.reactants[0].length)).toString() + "px";
+    console.log(prod.style.top);
+}
+
 function reactButton() {
+    for (let c in eq1.reactants[0]) {
+        eq1.reactants[2][c] = parseFloat(document.getElementById("chem_n_reactants_"+c).value);
+        eq1.reactants[3][c] = document.getElementById("chem_u_reactants_" + c).value;
+    }
+    console.log(eq1.reactants);
+
     eq1.clear();
     addConditions(eq1);
     console.log(eq1.conditions);
@@ -187,7 +233,14 @@ function reactButton() {
     else {
         output.innerText = displayReact(eq1, true);
     }
-    //eq2.react();
+    displayResults(eq1.reactants, 'reactants');
+    displayResults(eq1.products, 'products');
+
+    for (let c in eq1.products[0]) {
+        document.getElementById("chem_n_products_" + c).value = eq1.products[2][c];
+        document.getElementById("chem_u_products_" + c).value = eq1.products[3][c];
+    }
+    console.log(eq1.reactants);
     
 }
 
@@ -362,4 +415,21 @@ function addConditions(equation) {
         equation.conditions[0][c] = document.getElementById(condset[c] + "_n").value
         if (c >= 2) { break; }
     }
+}
+
+function AddChemicalsToReaction() {
+    //AuxillaryCondSet
+    //Amounts/Units
+    //Input into reation object
+    //Update displayReact
+}
+
+function displaySearchResults(element) {
+    const searchAlgoritim = (string) => {
+        let name = "";
+        let formula = "";
+        //Algoritim to get most relevant
+        return [name, formula]
+    }
+    //Display onto search element
 }
