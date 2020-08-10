@@ -418,8 +418,11 @@ function ChangeUnits(auxillary = false) {
                 if (auxcondset[c].includes('reactants')){
                     document.getElementById("chem_n_" + auxcondset[c]).value = round(eq1.convertUnits(eq1.reactants[0][c], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
                 } else {
-                    console.log(eq1.products[0][c]);
-                    document.getElementById("chem_n_" + auxcondset[c]).value = round(eq1.convertUnits(eq1.products[0][c], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
+                    console.log(eq1.products[0]);
+                    console.log(c, auxcondset);
+                    console.log(eq1.products[0][0]);
+                    let x = c - eq1.reactants[0].length;
+                    document.getElementById("chem_n_" + auxcondset[c]).value = round(eq1.convertUnits(eq1.products[0][x], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
                 }
             }
         }
