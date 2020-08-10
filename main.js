@@ -240,7 +240,9 @@ function displayResults(set, code) {
     }
     for (let c in set[0]) {
         document.getElementById("chem_n_" + code + "_" + c).style.position = "relative";
+        document.getElementById("chem_u_" + code + "_" + c).style.position = "relative";
         document.getElementById("chem_n_" + code + "_" + c).style.left = (longest - deviation[c]).toString() + "px";
+        document.getElementById("chem_u_" + code + "_" + c).style.left = (longest - deviation[c]).toString() + "px";
     }
 
     let prod = document.getElementById('results_products');
