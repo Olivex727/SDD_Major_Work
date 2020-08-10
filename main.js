@@ -192,7 +192,7 @@ function displayResults(set, code) {
     console.log(code);
     let results = document.getElementById('results_'+code);
     let element = document.getElementById('displayelement');
-    const selectiontab = 'onchange="ChangeUnits(true);" value="mol"> <option value = "mol" > mol </option> <option value = "M" > M </option> <option value = "Kg" > Kg </option> <option value = "g" > g </option> <option value = "mg" > mg </option> <option value = "µg" > µg </option> <option value = "KL" > KL </option> <option value = "L" > L </option> <option value = "mL" > mL </option> </select> </li>'
+    const selectiontab = '" onchange="ChangeUnits(true);" value="mol"> <option value = "mol" > mol </option> <option value = "M" > M </option> <option value = "Kg" > Kg </option> <option value = "g" > g </option> <option value = "mg" > mg </option> <option value = "µg" > µg </option> </select> </li>'
 
     results.innerHTML = "<p>"+capitalize(code)+":</p>";
 
@@ -223,7 +223,7 @@ function displayResults(set, code) {
         e.innerHTML = '<li onclick="ConditionCheck(true)"> <span id ="chem_t_' + code + "_" + c +
         '">' + set[0][c].name + //'<span id="clear">' + spaces + '</span>' +
         '</span>: <input type = "number" id = "chem_n_' + code + "_" + c +
-        '" value="1"' + readOnlyString + '> <select id = "chem_u_' + code + "_" + c + '"'
+        '" value="' + set[2][c] + '"' + readOnlyString + '> <select id = "chem_u_' + code + "_" + c
         + selectiontab;
 
         results.appendChild(e);
@@ -287,6 +287,9 @@ function deleteButton() {
     output.style.color = "grey";
     output.innerText = "Enter Chemicals -->";
     auxcounter = 0;
+    auxcondset = [];
+    oldConditionUnits[1] = [];
+    formulaOnStage = "";
     displayResults(eq1.reactants, 'reactants');
     displayResults(eq1.products, 'products');
 }
@@ -411,16 +414,12 @@ function ChangeUnits(auxillary = false) {
     } else {
         for (let c in auxcondset) {
             if (document.getElementById("chem_u_" + auxcondset[c]).value !== oldConditionUnits[1][c]) {
-                console.log(true);
-                if (
-                    (document.getElementById("chem_u_" + auxcondset[c]).value.includes('L') && oldConditionUnits[1][c].includes('L')) ||
-                    (document.getElementById("chem_u_" + auxcondset[c]).value.includes('g') && oldConditionUnits[1][c].includes('g'))
-                ) {
-                    document.getElementById("chem_n_" + auxcondset[c]).value =
-                        onlyConditionUnits(
-                            [parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c]],
-                            [1, document.getElementById("chem_u_" + auxcondset[c]).value]
-                        );
+                addConditions(eq1);
+                if (auxcondset[c].includes('reactants')){
+                    document.getElementById("chem_n_" + auxcondset[c]).value = round(eq1.convertUnits(eq1.reactants[0][c], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
+                } else {
+                    console.log(eq1.products[0][c]);
+                    document.getElementById("chem_n_" + auxcondset[c]).value = round(eq1.convertUnits(eq1.products[0][c], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
                 }
             }
         }
@@ -453,8 +452,8 @@ function onlyConditionUnits(oldconds, newconds) {
         newconds[0] = oldconds[0] * 101325;
     }
 
-    //Capacity/Mass
-    //Nothing, since the only conversions are from mL -> L -> KL
+    //Mass
+    //Nothing, since the only conversions are from mg -> g -> Kg
 
     //Convert to basic units
     if (oldconds[1].includes("m") && !oldconds[1].includes("atm")) {
@@ -518,16 +517,22 @@ function addChemicalsToReaction() {
     console.log(addition);
     
     //Input into reation object
+    addConditions(eq1);
     eq1.reactants[0][auxcounter] = addition;
     eq1.reactants[1][auxcounter] = 1;
-    eq1.reactants[2][auxcounter] = parseFloat(document.getElementById("chem_n").value);
-    eq1.reactants[3][auxcounter] = document.getElementById("chem_u").value;
+    eq1.reactants[2][auxcounter] =
+    eq1.convertUnits(addition, parseFloat(document.getElementById("chem_n").value), document.getElementById("chem_u").value, "mol");
+    eq1.reactants[3][auxcounter] = "mol";
     eq1.reactants[4][auxcounter] = addition.state;
+
+    
 
     //AuxillaryCondSet
     auxcondset.push("reactants_" + auxcounter);
     auxcounter++;
     //console.log("lol", auxcondset);
+
+    console.log(eq1.reactants);
 
     //Update displayReact/output
     displayResults(eq1.reactants, 'reactants');

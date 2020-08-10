@@ -209,7 +209,7 @@
                 </select>
 
                 Volume: <input type="number" id="vol_n" value="1"></input>
-                <select id="vol_u" value="K" onchange="ChangeUnits();">
+                <select id="vol_u" onchange="ChangeUnits();">
                     <option value="L">L</option>
                     <option value="KL">KL</option>
                     <option value="mL">mL</option>
@@ -238,9 +238,6 @@
                 <option value="g">g</option>
                 <option value="mg">mg</option>
                 <option value="µg">µg</option>
-                <option value="KL">KL</option>
-                <option value="L">L</option>
-                <option value="mL">mL</option>
             </select>
             <button id="Add" onclick="addChemicalsToReaction();"><b>Add</b></button>
             <span id="chemicalonstage">.</span>
