@@ -68,16 +68,18 @@ window.onload = function () {
 
 //=======COSMETICS=======//
 
-function changeButtonColor(obj, onobj=true){
+function changeButtonColor(obj, onobj = true, aquamarine = true) {
     let element = document.getElementById(obj.id);
     let color = "#477862";
-    if (!onobj) { color = "aquamarine"; }
+    if (!onobj && aquamarine) { color = "aquamarine"; }
+    else if (!onobj && !aquamarine) { color = "white"; }
+    else if (onobj && !aquamarine) { color = "grey"; }
     element.style.backgroundColor = color;
 }
 
 function displaySearch(infocus){
     let searchdiv = document.getElementById('searchout');
-    if (infocus){
+    if (infocus) {
         searchdiv.style.visibility = 'visible';
         searchdiv.style.display = 'inherit';
     } else {
@@ -150,15 +152,26 @@ console.log(eq2.getId(true));
 */
 
 const condset = ["temp", "pressure" , "vol", "chem"];
-let auxcondset = [];
+let auxcondset = []; let auxcounter = 0;
+let formulaOnStage = "";
 
-let oldConditionUnits = [];
+let oldConditionUnits = [[], []];
 
 output.innerText = displayReact(eq1, false);
 
-/**/
-displayResults(eq1.reactants, 'reactants');
+/*AUTOMATIC OPERATION*/
+
+//displayResults(eq1.reactants, 'reactants');
+//reactButton();
+deleteButton();
+addChemicalToStage({id: "NaCl"});
+addChemicalsToReaction();
+addChemicalToStage({id: "H2O"});
+addChemicalsToReaction();
 reactButton();
+
+/*AUTOMATIC OPERATION*/
+
 /*
 ts();
 
@@ -175,40 +188,60 @@ setInterval(ts, 10000);
 */
 
 function displayResults(set, code) {
+    console.log("DISPLAY RESULTS");
     console.log(code);
     let results = document.getElementById('results_'+code);
     let element = document.getElementById('displayelement');
-    const selectiontab = 'value="mol"> <option value = "mol" > mol </option> <option value = "M" > M </option> <option value = "Kg" > Kg </option> <option value = "g" > g </option> <option value = "mg" > mg </option> <option value = "µg" > µg </option> <option value = "KL" > KL </option> <option value = "L" > L </option> <option value = "mL" > mL </option> </select> </li>'
+    const selectiontab = 'onchange="ChangeUnits(true);" value="mol"> <option value = "mol" > mol </option> <option value = "M" > M </option> <option value = "Kg" > Kg </option> <option value = "g" > g </option> <option value = "mg" > mg </option> <option value = "µg" > µg </option> <option value = "KL" > KL </option> <option value = "L" > L </option> <option value = "mL" > mL </option> </select> </li>'
 
     results.innerHTML = "<p>"+capitalize(code)+":</p>";
 
     let readOnlyString = "";
     if (code === 'products') { readOnlyString = " readonly=true";}
 
+    let deviation = [];
+    /*
     let longest = 0;
     for (let c in set[0]) {
         if (set[0][c].name.length > longest) {
             longest = set[0][c].name.length;
         }
     }
+    */
 
     for (let c in set[0]) {
         let e = element.cloneNode(true);
 
         e.id = "set_"+code+"_"+c;
-
+        /*
         let spaces = "";
         for (i = 0; i < longest - set[0][c].name.length; i++) { spaces += "_"; }
         spaces += "_";
         //console.log(spaces);
+        */
 
-        e.innerHTML = '<li> <span id ="chem_t_' + code + "_" + c +
-        '">' + set[0][c].name + '<span id="clear">' + spaces + '</span>' +
+        e.innerHTML = '<li onclick="ConditionCheck(true)"> <span id ="chem_t_' + code + "_" + c +
+        '">' + set[0][c].name + //'<span id="clear">' + spaces + '</span>' +
         '</span>: <input type = "number" id = "chem_n_' + code + "_" + c +
         '" value="1"' + readOnlyString + '> <select id = "chem_u_' + code + "_" + c + '"'
         + selectiontab;
 
         results.appendChild(e);
+
+        deviation.push(document.getElementById("chem_t_" + code + "_" + c).offsetWidth);
+    }
+    console.log(deviation);
+    let longest = deviation[0];
+    for (let c in set[0]) {
+        if (deviation[c] > longest) {
+            longest = deviation[c];
+        }
+    }
+    for (let c in set[0]) {
+        //let box =
+        document.getElementById("chem_t_" + code + "_" + c).style.Left = 1000;
+        //box.;
+        console.log(set[0][c].name, longest - deviation[c]);
     }
 
     let prod = document.getElementById('results_products');
@@ -239,7 +272,11 @@ function reactButton() {
     for (let c in eq1.products[0]) {
         document.getElementById("chem_n_products_" + c).value = eq1.products[2][c];
         document.getElementById("chem_u_products_" + c).value = eq1.products[3][c];
+        auxcondset.push("products_" + c);
     }
+    //console.log(auxcondset);
+    ConditionCheck(true);
+
     console.log(eq1.reactants);
     
 }
@@ -248,14 +285,15 @@ function deleteButton() {
     eq1 = new formula();
     output.style.color = "grey";
     output.innerText = "Enter Chemicals -->";
-}
-
-function addChemicals() {
-    output.style.color = "black";
+    auxcounter = 0;
+    displayResults(eq1.reactants, 'reactants');
+    displayResults(eq1.products, 'products');
 }
 
 function displayReact(equation, displayproducts) {
     //let equation = new formula();
+    output.style.color = "black";
+
     let display = "\\(";
     console.log(equation)
     const formLaTex = (set) => {
@@ -314,44 +352,79 @@ function displayReact(equation, displayproducts) {
 }
 
 //Checks if the conditions are not negative, stores values in case of onchange event
-function ConditionCheck() {
+function ConditionCheck(auxillary = false) {
     let element_n = null; let element_u = null;
-    for (let c in condset) {
-        s = condset[c];
-        element_n = document.getElementById(s + "_n");
-        element_u = document.getElementById(s + "_u");
-        //console.log(element_n.value);
-        if (parseFloat(element_n.value) <= 0) {
-            if (element_u.value != "C" || parseFloat(element_n.value) <= -273.15) {
-                element_n.value = 1;
+    if (!auxillary) {
+        for (let c in condset) {
+            s = condset[c];
+            element_n = document.getElementById(s + "_n");
+            element_u = document.getElementById(s + "_u");
+            //console.log(element_n.value);
+            if (parseFloat(element_n.value) <= 0) {
+                if (element_u.value != "C" || parseFloat(element_n.value) <= -273.15) {
+                    element_n.value = 1;
+                }
             }
+            oldConditionUnits[0][c] = element_u.value;
         }
-        oldConditionUnits[c] = element_u.value;
+    }
+    else {
+        for (let c in auxcondset) {
+            s = auxcondset[c];
+            element_n = document.getElementById("chem_n_" + s);
+            element_u = document.getElementById("chem_u_" + s);
+            //console.log("URBICUE", element_n.value);
+            if (parseFloat(element_n.value) <= 0) {
+                if (element_u.value != "C" || parseFloat(element_n.value) <= -273.15) {
+                    element_n.value = 1;
+                }
+            }
+            oldConditionUnits[1][c] = element_u.value;
+        }
     }
 
-    console.log(oldConditionUnits);
+    console.log(oldConditionUnits[1]);
 }
 
 //Activated after the onchange event for all of the unit selections
-function ChangeUnits() {
-    alert(oldConditionUnits);
-    //alert(oldConditionUnits[1]);
-    for (let c in condset) {
-        if (document.getElementById(condset[c] + "_u").value !== oldConditionUnits[c]) {
-            console.log(true);
-            if (
-                (document.getElementById(condset[c] + "_u").value.includes('L') && oldConditionUnits[c].includes('L')) ||
-                (document.getElementById(condset[c] + "_u").value.includes('g') && oldConditionUnits[c].includes('g'))
-            ) {
-                document.getElementById(condset[c] + "_n").value =
-                onlyConditionUnits(
-                    [parseFloat(document.getElementById(condset[c] + "_n").value), oldConditionUnits[c]],
-                    [1, document.getElementById(condset[c] + "_u").value]
-                );
+function ChangeUnits(auxillary = false) {
+    alert(oldConditionUnits[0]);
+    //alert(oldConditionUnits[0][1]);
+    if (!auxillary) {
+        for (let c in condset) {
+            if (document.getElementById(condset[c] + "_u").value !== oldConditionUnits[0][c]) {
+                console.log(true);
+                if (
+                    ((document.getElementById(condset[c] + "_u").value.includes('L') && oldConditionUnits[0][c].includes('L')) ||
+                        (document.getElementById(condset[c] + "_u").value.includes('g') && oldConditionUnits[0][c].includes('g'))) ||
+                    c != 3
+                ) {
+                    document.getElementById(condset[c] + "_n").value =
+                        onlyConditionUnits(
+                            [parseFloat(document.getElementById(condset[c] + "_n").value), oldConditionUnits[0][c]],
+                            [1, document.getElementById(condset[c] + "_u").value]
+                        );
+                }
+            }
+        }
+    } else {
+        for (let c in auxcondset) {
+            if (document.getElementById("chem_u_" + auxcondset[c]).value !== oldConditionUnits[1][c]) {
+                console.log(true);
+                if (
+                    (document.getElementById("chem_u_" + auxcondset[c]).value.includes('L') && oldConditionUnits[1][c].includes('L')) ||
+                    (document.getElementById("chem_u_" + auxcondset[c]).value.includes('g') && oldConditionUnits[1][c].includes('g'))
+                ) {
+                    document.getElementById("chem_n_" + auxcondset[c]).value =
+                        onlyConditionUnits(
+                            [parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c]],
+                            [1, document.getElementById("chem_u_" + auxcondset[c]).value]
+                        );
+                }
             }
         }
     }
-    console.log(oldConditionUnits);
+    console.log("lol", oldConditionUnits);
     
 }
 
@@ -409,7 +482,7 @@ function onlyConditionUnits(oldconds, newconds) {
 
 //Adds all of the conditions to the reaction
 function addConditions(equation) {
-    equation.conditions[1] = ["C", "KPa", "L"]; //oldConditionUnits;
+    equation.conditions[1] = ["C", "KPa", "L"]; //oldConditionUnits[0];
 
     for (let c in condset) {
         equation.conditions[0][c] = document.getElementById(condset[c] + "_n").value
@@ -417,19 +490,93 @@ function addConditions(equation) {
     }
 }
 
-function AddChemicalsToReaction() {
-    //AuxillaryCondSet
-    //Amounts/Units
+function addChemicalsToReaction() {
+    //Prevent Duplicates/Null inputs
+    let sameflag = false;
+    for (let c in eq1.reactants[0]) {
+        if (eq1.reactants[0][c].formula === formulaOnStage) {
+            sameflag = true;
+        }
+    }
+    if (formulaOnStage === "") {
+        alert("You need to search and add a chemical to the stage.");
+        return null;
+    }
+    if (sameflag) {
+        alert("You can't double up on chemicals. Select a different chemical.");
+        return null;
+    }
+
+    //Create Chemical Instance
+    let addition = new chemical(formulaOnStage, "none", "none");
+    addition.name = addition.getDriver("name");
+    addition.type = addition.getDriver("type");
+    addition.ion = addition.getDriver("ion");
+    addition.state = addition.getDriver("state");
+
+    console.log(addition);
+    
     //Input into reation object
-    //Update displayReact
+    eq1.reactants[0][auxcounter] = addition;
+    eq1.reactants[1][auxcounter] = 1;
+    eq1.reactants[2][auxcounter] = parseFloat(document.getElementById("chem_n").value);
+    eq1.reactants[3][auxcounter] = document.getElementById("chem_u").value;
+    eq1.reactants[4][auxcounter] = addition.state;
+
+    //AuxillaryCondSet
+    auxcondset.push("reactants_" + auxcounter);
+    auxcounter++;
+    //console.log("lol", auxcondset);
+
+    //Update displayReact/output
+    displayResults(eq1.reactants, 'reactants');
+    output.innerText = displayReact(eq1, false);
+    ConditionCheck(true);
+
+    //Remove chemical from stage
+    let textbox = document.getElementById("chem_n");
+    let selectbox = document.getElementById("chem_u");
+    textbox.value = 1;
+    selectbox.value = "mol";
+
+    let stagename = document.getElementById("chemicalonstage");
+    stagename.innerHTML = ".";
+    stagename.style.color = "transparent";
+    formulaOnStage = "";
 }
 
-function displaySearchResults(element) {
+function displaySearchResults() {
+    //Algoritim to get most relevant to the search query
     const searchAlgoritim = (string) => {
-        let name = "";
-        let formula = "";
-        //Algoritim to get most relevant
+        let name = ["Sodium Chloride", "Water"];
+        let formula = ["NaCl", "H2O"];
+        
         return [name, formula]
     }
+    
+    //Get the list of suggestions
+    const query = document.getElementById("search").value;
+    let displayset = searchAlgoritim(query);
+
+    //Clear Search element
+    let searchout = document.getElementById("searchout");
+    searchout.innerHTML = ""
+
     //Display onto search element
+    for (let c in displayset[0]) {
+        searchout.innerHTML += '<li id="' + displayset[1][c] +
+        '" onclick="addChemicalToStage(this);" onmouseleave="changeButtonColor(this, false, false)" onmouseover="changeButtonColor(this, true, false)">'
+        + displayset[0][c] + ' <i>' + displayset[1][c] + '</i></li>';
+    }
+}
+
+function addChemicalToStage(element) {
+    console.log("Added!");
+    displaySearch(false);
+
+    let stagename = document.getElementById("chemicalonstage");
+    stagename.innerHTML = "Current Element: " + element.id;
+    stagename.style.color = "black";
+
+    formulaOnStage = element.id;
 }

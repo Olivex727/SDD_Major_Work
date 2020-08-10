@@ -60,6 +60,7 @@
                 border-color: black;
                 border-width: 1px;
                 background-color: white;
+                color: black;
             }
 
             .intf input {
@@ -86,7 +87,7 @@
             .search {
                 position: relative;
                 left: 1000px;
-                bottom: 555px;/*146px;/*256px;/*185px; /*205px;*/
+                bottom: 582px;/*146px;/*256px;/*185px; /*205px;*/
             }
 
             .search input {
@@ -132,6 +133,13 @@
                 font-size: 20px;
             }
 
+            .addstage span {
+                display: block;
+                margin-top: 10px;
+                font-size: 15px;
+                color: transparent;
+            }
+
             .extra {
                 border: 1px solid black;
                 width: 100%;
@@ -165,6 +173,10 @@
 
             .extra p {
                 margin-left: 120px;
+            }
+
+            .extra input {
+                position: relative;
             }
 
             #displayelement {
@@ -230,7 +242,8 @@
                 <option value="L">L</option>
                 <option value="mL">mL</option>
             </select>
-            <button id="Add"><b>Add</b></button>
+            <button id="Add" onclick="addChemicalsToReaction();"><b>Add</b></button>
+            <span id="chemicalonstage">.</span>
         </div>
         
         <div class="extra">
@@ -261,9 +274,9 @@
             </div>
         </div>
 
-        <div class="search">
+        <div class="search" id="searchbar">
             <input id="search" type="text" placeholder="Search Chemicals..." onfocus="displaySearch(true);"
-                onfocusout="displaySearch(false);" onkeypress="displaySearchResults(this);">
+                 onkeyup="displaySearchResults();"><!--onfocusout="displaySearch(false);"-->
             <div id="searchout">
                 <li id="CH3COOH">Acetic Acid <i>CH3COOH</i></li>
                 <li id="NaCl">Sodium Chloride <i>NaOH</i></li>

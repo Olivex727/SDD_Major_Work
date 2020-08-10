@@ -1,6 +1,8 @@
 formula|state|∆H|∆S|MP|BP|∆Vr|Density|ion|name
-NaCl|aq|-411.12|72|1073.8|1738|0|-1|Sodium Chloride
+NaCl|aq|-411.12|72|1073.8|1738|0|0|0|Sodium Chloride
 H2O|l|0|0|273.15|373.15|0|1|0|Water
 NO3||||||||-1|Nitrate Ion
+Na||||||||1|Sodium Ion
+Cl||||||||-1|Chloride Ion
 SO3||||||||-2|Sulfite Ion
 NH4||||||||1|Ammonium Ion
