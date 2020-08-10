@@ -230,7 +230,8 @@ function displayResults(set, code) {
 
         deviation.push(document.getElementById("chem_t_" + code + "_" + c).offsetWidth);
     }
-    console.log(deviation);
+
+    //Align the text box elements with eachother
     let longest = deviation[0];
     for (let c in set[0]) {
         if (deviation[c] > longest) {
@@ -238,10 +239,8 @@ function displayResults(set, code) {
         }
     }
     for (let c in set[0]) {
-        //let box =
-        document.getElementById("chem_t_" + code + "_" + c).style.Left = 1000;
-        //box.;
-        console.log(set[0][c].name, longest - deviation[c]);
+        document.getElementById("chem_n_" + code + "_" + c).style.position = "relative";
+        document.getElementById("chem_n_" + code + "_" + c).style.left = (longest - deviation[c]).toString() + "px";
     }
 
     let prod = document.getElementById('results_products');
