@@ -141,8 +141,6 @@ eq2 = new formula(false, [
 let output = document.getElementById("output");
 
 output.innerText = "\\(2H_{2}O\\ _{(g)}\\rightarrow2H_{2}\\ _{(g)}+O_{2}\\ _{(g)}\\)";
-deleteButton();
-
 
 /*
 console.log(eq1.getId(false));
@@ -159,6 +157,7 @@ let formulaOnStage = "";
 let oldConditionUnits = [[], []];
 
 output.innerText = displayReact(eq1, false);
+deleteButton();
 
 /*AUTOMATIC OPERATION*/
 
