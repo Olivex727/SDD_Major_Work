@@ -39,16 +39,24 @@ function shuffle(array, num) {
     return array;
 }
 
-function bubbleSort(array) {
+//Bubble sort an array of integer arrays or just integers -- integers will use no parameter
+function bubbleSort(array, index=-1) {
     let swapped = true;
     while (swapped) {
         swapped = false;
         let compare = 0;
         while (compare < array.length-1) {
-            if (array[compare] > array[compare+1]) {
+            if (index >= 0 && array[compare][index] > array[compare + 1][index]) {
+                
                 let temp = array[compare];
-                array[compare] = array[compare+1];
-                array[compare+1] = temp;
+                array[compare] = array[compare + 1];
+                array[compare + 1] = temp;
+                swapped = true;
+            }
+            else if (index == -1 && array[compare] > array[compare + 1]) {
+                let temp = array[compare];
+                array[compare] = array[compare + 1];
+                array[compare + 1] = temp;
                 swapped = true;
             }
             compare++;
@@ -149,10 +157,25 @@ function getMin(array) {
 
 console.log(capitalize("lol"));
 
+//Capitalises the first letter in a string
 function capitalize(string) {
     let x = string.split("");
     x[0] = x[0].toUpperCase()
     return x.join('');
+}
+
+//Ranks how alike/relevant the string parameter is to the base string
+//Due to the ratioing, longer strings (usually names not formulas) are going to end up lower on the list
+function rankString(base, string) {
+    let score = 0;
+
+    //The points are ratioed based on the proportion of the matching string to the whole string
+    if (string.toLowerCase().includes(base.toLowerCase())) {
+        score = 100 * base.length / string.length;
+    }
+    console.log(base, string);
+    
+    return score;
 }
 
 console.log("END STANDARD ALGOS");

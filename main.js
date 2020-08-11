@@ -36,7 +36,8 @@ for (let e in pt) {
         red_pot: parseFloat(elm[6]),
         density: parseFloat(elm[7]),
         ion: parseFloat(elm[8]),
-        name: elm[9]
+        name: elm[9],
+        displayInSearch: (elm[10] === "true")
     };
 }
 console.log(driverdict);
@@ -283,6 +284,7 @@ function reactButton() {
 }
 
 function deleteButton() {
+    //Clear reaction display
     eq1 = new formula();
     output.style.color = "grey";
     output.innerText = "Enter Chemicals -->";
@@ -290,8 +292,21 @@ function deleteButton() {
     auxcondset = [];
     oldConditionUnits[1] = [];
     formulaOnStage = "";
+
+    //Update auxillary section
     displayResults(eq1.reactants, 'reactants');
     displayResults(eq1.products, 'products');
+
+    //Remove chemical from stage
+    let textbox = document.getElementById("chem_n");
+    let selectbox = document.getElementById("chem_u");
+    textbox.value = 1;
+    selectbox.value = "mol";
+
+    let stagename = document.getElementById("chemicalonstage");
+    stagename.innerHTML = ".";
+    stagename.style.color = "transparent";
+    formulaOnStage = "";
 }
 
 function displayReact(equation, displayproducts) {
@@ -557,9 +572,34 @@ function addChemicalsToReaction() {
 function displaySearchResults() {
     //Algoritim to get most relevant to the search query
     const searchAlgoritim = (string) => {
-        let name = ["Sodium Chloride", "Water"];
-        let formula = ["NaCl", "H2O"];
+        let name = [];
+        let formula = [];
+        let search = [];
         
+        console.log(string);
+
+        for (let c in driverdict) {
+            //Get the likeness rank of both formula and name
+            search.push([rankString(string, c) + rankString(string, driverdict[c].name), c]);
+        }
+        
+        //Sort the search array with highest score first
+        bubbleSort(search, 0);
+        search.reverse();
+
+        //Add search to name and formula
+        for (let c in search) {
+            if (
+                !(formula.includes(search[c][1]) || name.includes(driverdict[search[c][1]].name)) &&
+                search[c][0] != 0 && driverdict[search[c][1]].displayInSearch && c < 10
+                ) {
+                name.push(driverdict[search[c][1]].name);
+                formula.push(search[c][1]);
+            }
+        }
+
+        console.log(search);
+
         return [name, formula]
     }
     
@@ -572,10 +612,31 @@ function displaySearchResults() {
     searchout.innerHTML = ""
 
     //Display onto search element
+    let deviation = []; let chemdeviation = [];
     for (let c in displayset[0]) {
         searchout.innerHTML += '<li id="' + displayset[1][c] +
-        '" onclick="addChemicalToStage(this);" onmouseleave="changeButtonColor(this, false, false)" onmouseover="changeButtonColor(this, true, false)">'
-        + displayset[0][c] + ' <i>' + displayset[1][c] + '</i></li>';
+        '" onclick="addChemicalToStage(this);" onmouseleave="changeButtonColor(this, false, false)" onmouseover="changeButtonColor(this, true, false)">' +
+        '<span id="search_name_' + c + '">'+ displayset[0][c] + ' </span> <i id="search_formula_' + c + '">' + displayset[1][c] + '</i> </li>';
+
+        deviation.push(document.getElementById("search_name_"+c).offsetWidth);
+        chemdeviation.push(document.getElementById("search_formula_" + c).offsetWidth);
+    }
+
+    //Align the formula i-tag elements with eachother
+    let longest = deviation[0]; let longestchem = chemdeviation[0];
+    for (let c in displayset[0]) {
+        if (deviation[c] > longest) {
+            longest = deviation[c];
+        }
+        if (chemdeviation[c] > longestchem) {
+            longestchem = chemdeviation[c];
+        }
+    }
+    
+    for (let c in displayset[0]) {
+        document.getElementById("search_formula_" + c).style.position = "relative";
+        document.getElementById("search_formula_" + c).style.left = (longest - deviation[c] + 30).toString() + "px";
+        searchout.style.width = (longest + longestchem + 40).toString() + "px";
     }
 }
 
@@ -584,7 +645,7 @@ function addChemicalToStage(element) {
     displaySearch(false);
 
     let stagename = document.getElementById("chemicalonstage");
-    stagename.innerHTML = "Current Element: " + element.id;
+    stagename.innerHTML = "Current Chemical: " + element.id;
     stagename.style.color = "black";
 
     formulaOnStage = element.id;
