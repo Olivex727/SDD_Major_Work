@@ -199,10 +199,12 @@ function displayResults(set, code) {
 
     results.innerHTML = "<p>"+capitalize(code)+":</p>";
 
+    /*
     let readOnlyString = "";
     if (code === 'products' || code === 'excess') {
         readOnlyString = " readonly=true";
     }
+    */
 
     let deviation = [];
     /*
@@ -228,7 +230,7 @@ function displayResults(set, code) {
         e.innerHTML = '<li onclick="ConditionCheck(true)"> <span id ="chem_t_' + code + "_" + c +
         '">' + set[0][c].name + //'<span id="clear">' + spaces + '</span>' +
         '</span>: <input type = "number" id = "chem_n_' + code + "_" + c +
-        '" value="' + set[2][c] + '"' + readOnlyString + '> <select id = "chem_u_' + code + "_" + c
+        '" value="' + set[2][c] + '" readonly=true> <select id = "chem_u_' + code + "_" + c
         + selectiontab;
 
         results.appendChild(e);
