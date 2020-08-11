@@ -142,7 +142,7 @@ class formula {
         this.reactants = reactants; //Array of 3-size arrays [chemical, Ratio, Amount, Units, State]
         this.conditions = conditions; //Tempurature, Pressure etc.
         this.isDynamic = eq; //Static or Dynamic
-        this.excess = [[], [], []] //Excess unreacted chemicals [chemical, amount, units]
+        this.excess = [[], [], [], []] //Excess unreacted chemicals [chemical, amount, units]
 
         this.products = [[], [], [], [], []];
         this.equilibrum = this.getEq();
@@ -195,6 +195,7 @@ class formula {
                             }
                             console.log(this.products);
                         }
+                        /*
                         else {
                             //Implement standardized system
                             for (let c in reactdict[r].products.split("+")) {
@@ -208,6 +209,7 @@ class formula {
                             }
                             //console.log(this.products);
                         }
+                        */
                     }
                 }
             }
@@ -597,6 +599,7 @@ class formula {
     getReactionType() {
         let type = [];
         for (let r in reactdict) {
+            //CHECK FOR WTF
             if (reactdict[r].base === "name") {
                 let rsplit = r.split("+");
                 let checkreact = true;
@@ -610,19 +613,16 @@ class formula {
                 }
             }
             
-            //CHECK FOR WTF
             if (reactdict[r].base === "formula") {
                 let rsplit = r.split("+");
                 let checkreact = true;
                 for (let c in rsplit) {
-                    //console.log(this.reactants);
-                    //console.log(this.getId(true), rsplit[c]);
-                    //console.log(this.getId(true).includes(rsplit[c]));
                     if (!this.getId(true).includes(rsplit[c])) {
                         checkreact = false;
                     }
                 }
                 if (checkreact) {
+                    console.log(reactdict[r]);
                     type.push(reactdict[r].id);
                 }
             }
@@ -671,7 +671,7 @@ class formula {
         }
         for (let c in this.reactants[0]) {
             if (basicmol < newreact[c] / this.reactants[1][c]) {
-                exchem.push(parseInt(c));
+                exchem.push(parseFloat(c));
             }
         }
 
@@ -683,8 +683,9 @@ class formula {
         //Add excess chemical information
         for (let c in exchem) {
             this.excess[0][c] = this.reactants[0][exchem[c]];
-            this.excess[1][c] = newreact[exchem[c]] - basicmol;
-            this.excess[2][c] = "mol";
+            this.excess[1][c] = ""; //Just a dummy set so that the display can show excess chemicals
+            this.excess[2][c] = newreact[exchem[c]] - basicmol;
+            this.excess[3][c] = "mol";
         }
 
         return this.reactants[0][limitreag];
@@ -856,7 +857,6 @@ class formula {
 
     //Gets and Returns the state of any chemicals in the reaction
     getState(chem, react) {
-        
         if (chem.getDriver("state") != null && chem.getDriver("state") !== "") {
             return chem.getDriver("state");
         }

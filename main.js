@@ -141,7 +141,7 @@ eq2 = new formula(false, [
 let output = document.getElementById("output");
 
 output.innerText = "\\(2H_{2}O\\ _{(g)}\\rightarrow2H_{2}\\ _{(g)}+O_{2}\\ _{(g)}\\)";
-
+deleteButton();
 
 
 /*
@@ -164,29 +164,32 @@ output.innerText = displayReact(eq1, false);
 
 //displayResults(eq1.reactants, 'reactants');
 //reactButton();
+/*
 deleteButton();
-addChemicalToStage({id: "NaCl"});
+
+addChemicalToStage({id: "CH4"});
 addChemicalsToReaction();
-addChemicalToStage({id: "H2O"});
+addChemicalToStage({id: "O2"});
 addChemicalsToReaction();
 reactButton();
-
+*/
 /*AUTOMATIC OPERATION*/
 
-/*
-ts();
+
+//ts();
 
 let tscount = 0;
 
 function ts() {
+    //document.getElementById('jax').innerHTML = '<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">';
     console.log("e");
     tscount++;
     output.innerText = "\\("+tscount+"\\)";
 }
 
 //IDEA --- RELOAD PAGE WHEN ACTIVIATING REACT FUNCTION!!
-setInterval(ts, 10000);
-*/
+//setInterval(ts, 10000);
+
 
 function displayResults(set, code) {
     console.log("DISPLAY RESULTS");
@@ -198,7 +201,9 @@ function displayResults(set, code) {
     results.innerHTML = "<p>"+capitalize(code)+":</p>";
 
     let readOnlyString = "";
-    if (code === 'products') { readOnlyString = " readonly=true";}
+    if (code === 'products' || code === 'excess') {
+        readOnlyString = " readonly=true";
+    }
 
     let deviation = [];
     /*
@@ -249,6 +254,12 @@ function displayResults(set, code) {
     let prod = document.getElementById('results_products');
     prod.style.top = (- 50 - (31 * eq1.reactants[0].length)).toString() + "px";
     console.log(prod.style.top);
+
+    let addon = 0;
+    if (eq1.products[0].length > 0) {addon = -6;}
+    let excess = document.getElementById('results_excess');
+    excess.style.top = (addon-85 - (31 * (eq1.products[0].length + eq1.reactants[0].length))).toString() + "px";
+    console.log("LOOOOOK" + excess.style.top);
 }
 
 function reactButton() {
@@ -270,11 +281,17 @@ function reactButton() {
     }
     displayResults(eq1.reactants, 'reactants');
     displayResults(eq1.products, 'products');
+    displayResults(eq1.excess, 'excess');
 
     for (let c in eq1.products[0]) {
         document.getElementById("chem_n_products_" + c).value = eq1.products[2][c];
         document.getElementById("chem_u_products_" + c).value = eq1.products[3][c];
         auxcondset.push("products_" + c);
+    }
+    for (let c in eq1.excess[0]) {
+        document.getElementById("chem_n_excess_" + c).value = eq1.excess[2][c];
+        document.getElementById("chem_u_excess_" + c).value = eq1.excess[3][c];
+        auxcondset.push("excess_" + c);
     }
     //console.log(auxcondset);
     ConditionCheck(true);
@@ -296,6 +313,7 @@ function deleteButton() {
     //Update auxillary section
     displayResults(eq1.reactants, 'reactants');
     displayResults(eq1.products, 'products');
+    displayResults(eq1.excess, 'excess');
 
     //Remove chemical from stage
     let textbox = document.getElementById("chem_n");
@@ -432,12 +450,14 @@ function ChangeUnits(auxillary = false) {
                 addConditions(eq1);
                 if (auxcondset[c].includes('reactants')){
                     document.getElementById("chem_n_" + auxcondset[c]).value = round(eq1.convertUnits(eq1.reactants[0][c], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
-                } else {
-                    console.log(eq1.products[0]);
-                    console.log(c, auxcondset);
-                    console.log(eq1.products[0][0]);
+                }
+                else if (auxcondset[c].includes('products')) {
                     let x = c - eq1.reactants[0].length;
                     document.getElementById("chem_n_" + auxcondset[c]).value = round(eq1.convertUnits(eq1.products[0][x], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
+                }
+                else if (auxcondset[c].includes('excess')) {
+                    let x = c - eq1.reactants[0].length - eq1.products[0].length;
+                    document.getElementById("chem_n_" + auxcondset[c]).value = round(eq1.convertUnits(eq1.excess[0][x], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
                 }
             }
         }
@@ -503,7 +523,8 @@ function addConditions(equation) {
     equation.conditions[1] = ["C", "KPa", "L"]; //oldConditionUnits[0];
 
     for (let c in condset) {
-        equation.conditions[0][c] = document.getElementById(condset[c] + "_n").value
+        equation.conditions[0][c] = parseFloat(document.getElementById(condset[c] + "_n").value);
+        equation.conditions[1][c] = document.getElementById(condset[c] + "_u").value
         if (c >= 2) { break; }
     }
 }

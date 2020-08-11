@@ -7,6 +7,6 @@ Cl||||||||-1|Chloride Ion|true
 SO3||||||||-2|Sulfite Ion|true
 NH4||||||||1|Ammonium Ion|true
 O2|g|||||||0|Oxygen|true
-CO2|g|||||||0|Carbon Dioxide|false
+CO2||||-56.6|-78.46|||0|Carbon Dioxide|false
 CH4|g|||||||0|Methane|true
 Cu(NH4)4SO4||||||||2|Copper Ammonium Sulfide|false

@@ -10,7 +10,9 @@
         -->
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-        <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+        <span id="jax">
+            <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+        </span>
         <link href="https://fonts.googleapis.com/css2?family=Work+Sans&display=swap" rel="stylesheet"></link>
         </script>
         <!--<link rel="stylesheet" href="./sty.css">-->
@@ -87,7 +89,7 @@
             .search {
                 position: relative;
                 left: 1000px;
-                bottom: 582px;/*146px;/*256px;/*185px; /*205px;*/
+                bottom: 577px;/*146px;/*256px;/*185px; /*205px;*/
             }
 
             .search input {
@@ -160,6 +162,14 @@
                 position: relative;
                 left: 500px;
                 top: -50px; /*Title moves 31px for each reactant element*/
+                display: inline;
+                /*margin-left: 360px;*/
+            }
+
+            .extra #results_excess {
+                position: relative;
+                left: 1000px;
+                top: -85px; /*Title moves 31px for each reactant element*/
                 display: inline;
                 /*margin-left: 360px;*/
             }
@@ -250,6 +260,9 @@
             </div>
             <div class="chemdisplay" id="results_products">
                 <p>Products:</p>
+            </div>
+            <div class="chemdisplay" id="results_excess">
+                <p>Excess:</p>
             </div>
             <!-- Below is a standard display element, that javascript will duplicate based on how many chemicals there are -->
             <div id="displayelement">
