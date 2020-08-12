@@ -29,16 +29,25 @@ app.get('/objjs', function (req, res) {
     res.send(page);
 });
 
-//Send the styling script
-app.get('/css', function (req, res) {
-    res.sendfile("webpage/style.css");
+//Standard Algoritims
+app.get('/algo', function (req, res) {
+    const page = fs.readFileSync("standardalgos.js", 'utf8');
+    res.send(page);
+});
+
+//Send the styling script - INVALID
+app.get('/css.css', function (req, res) {
+    console.log("css");
+    const page = fs.readFileSync("public/style.css", 'utf8');
+    res.send(page);
 });
 
 app.get('/file', function (req, res) {
-    res.sendfile('public/files/'+req.query.name + '.txt');
-})
+    res.sendfile('public/' + req.query.loc + '/' + req.query.name + '.txt');
+});
 
 //Host to port 8000
 app.listen(8000, function () {
-    console.log('listening on port 8000');
+    console.log('Listening on port 8000');
+    console.log('Server Hosted at localhost:8000');
 });

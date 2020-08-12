@@ -1,13 +1,43 @@
 # SDD_Major_Work
-Here is my Software Major Project
+Here is my Software Major Project - A chemical reaction simulator
 
-# History
+## User Manual/Program Features
 
-## Version No.
 
-Current Version - 0.1.1
+### User Manual
 
-## Major developments
+To get the user manual, go to the github page
 
-24/11/19 - Begun Work on project (Phase 1)
-3/12/19 - Completed Phase 1 and begun Phase 2
+### Extra Features
+
+Planned Extra features:
+- Equilibrium reactions
+- Further orgainic molecule reactions
+- Acid/Base reactions
+
+## History
+
+### Version No.
+
+Current Version - 0.2.4
+
+### Major developments
+
+24/11/2019 - Begun Work on project (Phase 1)
+
+3/12/2019 - Completed Phase 1
+
+20/2/2020 - Completed Phase 2A
+
+### Future Versions
+
+0.2.5 - Add the autoformulate functions
+0.2.6 - Finalise the react() function
+
+0.3 - Add the initial GUI Elements
+0.4 - Test and maintain the code, finalize
+
+1.0 - Finalize the code
+1.1 - Implement the Equilibrium system
+1.2 - Implement the Acid/Base system
+1.3 - Implement other ideas if time allows
