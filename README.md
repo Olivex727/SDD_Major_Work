@@ -3,6 +3,7 @@ Here is my Software Major Project - A chemical reaction simulator
 
 ## User Manual/Program Features
 
+
 ### User Manual
 
 To get the user manual, go to the github page
