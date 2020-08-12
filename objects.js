@@ -146,6 +146,7 @@ class formula {
 
         this.products = [[], [], [], [], []];
         this.equilibrum = this.getEq();
+        this.reacted = false;
     }
 
     //The main reaction producuer
@@ -170,6 +171,7 @@ class formula {
         console.log(this.products);
         if (this.equalize()) {
             console.log(this.calculate());
+            this.reacted = true;
             return true;
         }
         else {
@@ -857,16 +859,17 @@ class formula {
 
     //Gets and Returns the state of any chemicals in the reaction
     getState(chem, react) {
+        let conds = this.convertUnits(null, null, null, "K", true);
+        let state = "";
+
         if (chem.getDriver("state") != null && chem.getDriver("state") !== "") {
-            return chem.getDriver("state");
+            state = chem.getDriver("state");
         }
 
         if (react && chem.state != null) {
-            return chem.state;
+            state = chem.state;
         }
 
-        let conds = this.convertUnits(null, null, null, "K", true);
-        let state = "";
         if (chem.getDriver('mp') == null || chem.getDriver('bp') == null) {
             state = null;
             let aqflag = false;
@@ -905,7 +908,7 @@ class formula {
         else if (chem.getDriver('bp') < conds[0]) {
             state = "g";
         }
-        if (this.type == "combustion" && chem.formula == "H2O") {
+        if (reactdict[this.getReactDictR()].name === "combustion" && chem.formula === "H2O") {
             state = "g";
         }
         else if (parseInt(chem.getDriver('ion')) != 0) {
@@ -919,6 +922,26 @@ class formula {
         this.products = [[], [], [], [], []];
         this.conditions = [[], []];
         this.equilibrum = this.getEq();
+    }
+
+    //Gets the reaction dictionary object
+    getReactDictR() {
+        let returnid = null;
+        for (let r in reactdict){
+            let contains = true;
+            for (let c in this.reactants[0]) {
+                if (!r.includes(this.reactants[0][c].formula)) {
+                    contains = false;
+                }
+            }
+
+            if (contains) {
+                returnid = r;
+                break;
+            }
+        }
+        console.log(returnid);
+        return returnid;
     }
 }
 

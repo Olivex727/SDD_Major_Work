@@ -2,11 +2,11 @@
 
 console.log("BEGIN PROGRAM");
 
-function getFiles(input) {
+function getFiles(input, loc="files") {
     
     return $.ajax({
         type: "GET",
-        url: "/file?name="+input,
+        url: "/file?name="+input+"&loc="+loc,
         async : false
     }).responseText.split("\n");
 
@@ -158,6 +158,82 @@ let oldConditionUnits = [[], []];
 
 output.innerText = displayReact(eq1, false);
 deleteButton();
+
+// ==== DRIVER ==== //
+
+let driverText = getFiles("drivercheck", "driver");
+driverText.shift();
+
+let driverInst = {};
+for (let c in driverText) {
+    
+    let add = driverText[c].split('|');
+    
+    driverInst[add[0]] = {
+        ratio: add[1].split(','),
+        state: add[2].split(',')
+    }
+}
+
+driver();
+
+function driver() {
+    console.log(driverInst);
+    let faults = [];
+
+    //Automatically add chemicals and react
+    const autoReact = (chems) => {
+        console.log(chems);
+        for (let chem in chems) {
+            addChemicalToStage({id: chems[chem]});
+            addChemicalsToReaction();
+        }
+        reactButton();
+    }
+
+    //Check if the resulting formula object is as intended
+    const checkValid = () => {
+        let valid = true;
+        const id = eq1.getReactDictR();
+
+        for (let c in eq1.reactants[0]) {
+            if (eq1.reactants[1][c] != parseInt(driverInst[id].ratio[c])) {
+                //console.log(eq1.reactants[0][c], driverInst[eq1.getId(true)].ratio[c], eq1.reactants[1][c]);
+                valid = false;
+            }
+            if (eq1.reactants[4][c] != driverInst[id].state[c]) {
+                //console.log(eq1.reactants[0][c], driverInst[eq1.getId(true)].state[c], eq1.reactants[4][c]);
+                valid = false;
+            }
+        }
+        for (let c in eq1.products[0]) {
+            console.log(driverInst[id].ratio);
+            c = parseInt(c);
+            if (eq1.products[1][c] != parseInt(driverInst[id].ratio[c + eq1.reactants[0].length])) {
+                valid = false;
+            }
+            if (eq1.products[4][c] != driverInst[eq1.getId(true)].state[c + eq1.reactants[0].length]) {
+                console.log(eq1.products[0][c], driverInst[eq1.getId(true)].state[c + eq1.reactants[0].length], eq1.products[4][c]);
+                valid = false;
+            }
+        }
+
+        return valid;
+    }
+
+    for (let c in reactdict) {
+        if (!reactdict[c].std) {
+            autoReact(c.split('+'));
+            console.log("DRIVER: ", eq1);
+            if (!checkValid()) {
+                throw Error;
+            }
+            deleteButton();
+        }
+    }
+}
+
+// ==== DRIVER ==== //
 
 /*AUTOMATIC OPERATION*/
 
@@ -337,18 +413,18 @@ function displayReact(equation, displayproducts) {
     const formLaTex = (set) => {
         for (let n in set[0]) {
             let string = set[0][n].formula.split("");
-            //console.log(parseInt(string[0]).toString() == "NaN");
             for (let c in string) {
                 if (parseInt(string[c]).toString() != "NaN") {
                     string[c] = "_{" + string[c]+"}";
                 }
             }
-            //console.log(string.join(""));
-            //console.log(equation.getState(set[0][n], true));
 
             let state = "";
             if (set[4][n] == null) {
+                console.log("URBICUE", set[0][n]);
                 state = equation.getState(set[0][n], true);
+                set[4][n] = state;
+                console.log("URBICUE", set[4][n]);
             }
             else {
                 state = set[4][n];
@@ -544,6 +620,14 @@ function addChemicalsToReaction() {
     }
     if (sameflag) {
         alert("You can't double up on chemicals. Select a different chemical.");
+        return null;
+    }
+    if (eq1.reacted) {
+        alert("You need to clear the staged reaction first.");
+        return null;
+    }
+    if (eq1.reactants[0].length >= 2) {
+        alert("There is an upper limit of two reactants.");
         return null;
     }
 

@@ -43,7 +43,7 @@ app.get('/css.css', function (req, res) {
 });
 
 app.get('/file', function (req, res) {
-    res.sendfile('public/files/'+req.query.name + '.txt');
+    res.sendfile('public/' + req.query.loc + '/' + req.query.name + '.txt');
 });
 
 //Host to port 8000

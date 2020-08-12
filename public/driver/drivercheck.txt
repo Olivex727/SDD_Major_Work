@@ -1,0 +1,5 @@
+reactants|ratio|state
+H2O+NH4NO3|1,1,1,1,1|l,aq,aq,aq,l
+H2O+(NH4)2SO3|1,1,2,1,1|l,aq,aq,aq,l
+H2O+NaCl|1,1,1,1,1|l,aq,aq,aq,l
+O2+CH4|2,1,1,2|g,g,g,g
