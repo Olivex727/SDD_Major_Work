@@ -178,7 +178,6 @@ for (let c in driverText) {
 driver();
 
 function driver() {
-    console.log(driverInst);
     let faults = [];
 
     //Automatically add chemicals and react
@@ -198,11 +197,9 @@ function driver() {
 
         for (let c in eq1.reactants[0]) {
             if (eq1.reactants[1][c] != parseInt(driverInst[id].ratio[c])) {
-                //console.log(eq1.reactants[0][c], driverInst[eq1.getId(true)].ratio[c], eq1.reactants[1][c]);
                 valid = false;
             }
             if (eq1.reactants[4][c] != driverInst[id].state[c]) {
-                //console.log(eq1.reactants[0][c], driverInst[eq1.getId(true)].state[c], eq1.reactants[4][c]);
                 valid = false;
             }
         }
@@ -218,19 +215,36 @@ function driver() {
             }
         }
 
-        return valid;
+        return [valid, driverInst[id], reactdict[id], eq1];
     }
 
+    //Main subroutine loop
     for (let c in reactdict) {
         if (!reactdict[c].std) {
             autoReact(c.split('+'));
             console.log("DRIVER: ", eq1);
-            if (!checkValid()) {
-                throw Error;
+            let check = checkValid();
+            if (!check[0]) {
+                faults.push(check[1], check[2], check[3]);
             }
             deleteButton();
         }
     }
+
+    //Print Results
+    if (faults.length == 0) {
+        console.log("DRIVER RESULTS:\nAll good!");
+    }
+    else {
+        console.log("DRIVER RESULTS:");
+        for (let c in faults) {
+            console.log("ERROR:"+c);
+            console.log("inDriverInst:", faults[c][0]);
+            console.log("inReactDict:", faults[c][1]);
+            console.log("inReaction:", faults[c][2]);
+        }
+    }
+    
 }
 
 // ==== DRIVER ==== //
