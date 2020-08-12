@@ -13,8 +13,8 @@
 
 //Formula - MM
 let chemicaldict = {};
-let driverdict = {};
-let reactdict = {};
+let chemDict = {};
+let reactDict = {};
 
 //The chemical class stores information on the individial chemical identities
 class chemical {
@@ -33,8 +33,8 @@ class chemical {
     //Search for the chemicals's tempurature-based attributes
     getDriver(driver) {
         //Get Melting point (m), Boiling point (b), Temurature (t), Enthalpy (h), Entropy (s)
-        if (driverdict[this.formula] != null) {
-            return driverdict[this.formula][driver];
+        if (chemDict[this.formula] != null) {
+            return chemDict[this.formula][driver];
         }
         else {
             return null;
@@ -163,7 +163,7 @@ class formula {
 
         //Async in JS is annoying...
 
-        console.log(reactdict);
+        console.log(reactDict);
         let type = this.getReactionType();
         this.type = type;
         console.log(type);
@@ -183,25 +183,25 @@ class formula {
     formulateProducts(type) {
         if (!type.includes("none")) {
             for (let i in type) {
-                //Go through every item in the reaction, seach through reactdict, and add the products to the list
+                //Go through every item in the reaction, seach through reactDict, and add the products to the list
                 let item = type[i];
-                for (let r in reactdict) {
-                    if (reactdict[r].id == item) {
+                for (let r in reactDict) {
+                    if (reactDict[r].id == item) {
                         //console.log(item);
                         //Once a formula is found, it will not matter if it's special or standard
                         type.splice(type.indexOf(item), 1)
-                        if (!reactdict[r].std) {
-                            for (let chem in reactdict[r].products.split("+")) {
-                                let name = driverdict[reactdict[r].products.split("+")[chem]].name;
-                                this.addToReact(reactdict[r].products.split("+")[chem], null, name);
+                        if (!reactDict[r].std) {
+                            for (let chem in reactDict[r].products.split("+")) {
+                                let name = chemDict[reactDict[r].products.split("+")[chem]].name;
+                                this.addToReact(reactDict[r].products.split("+")[chem], null, name);
                             }
                             console.log(this.products);
                         }
                         /*
                         else {
                             //Implement standardized system
-                            for (let c in reactdict[r].products.split("+")) {
-                                let chem = reactdict[r].products.split("+")[c];
+                            for (let c in reactDict[r].products.split("+")) {
+                                let chem = reactDict[r].products.split("+")[c];
                                 if (chem === "water") { this.addToReact("H2O", chem, chem); }
                                 if (chem === "oxygen") { this.addToReact("O2", chem, chem); }
                                 if (chem === "acid") { 
@@ -600,9 +600,9 @@ class formula {
     //Determine the reaction type 
     getReactionType() {
         let type = [];
-        for (let r in reactdict) {
+        for (let r in reactDict) {
             //CHECK FOR WTF
-            if (reactdict[r].base === "name") {
+            if (reactDict[r].base === "name") {
                 let rsplit = r.split("+");
                 let checkreact = true;
                 for (let c in rsplit) {
@@ -611,11 +611,11 @@ class formula {
                     }
                 }
                 if (checkreact) {
-                    type.push(reactdict[r].id);
+                    type.push(reactDict[r].id);
                 }
             }
             
-            if (reactdict[r].base === "formula") {
+            if (reactDict[r].base === "formula") {
                 let rsplit = r.split("+");
                 let checkreact = true;
                 for (let c in rsplit) {
@@ -624,8 +624,8 @@ class formula {
                     }
                 }
                 if (checkreact) {
-                    console.log(reactdict[r]);
-                    type.push(reactdict[r].id);
+                    console.log(reactDict[r]);
+                    type.push(reactDict[r].id);
                 }
             }
         }
@@ -820,9 +820,9 @@ class formula {
     //Get the Equilibrium constant for the reaction
     getEq() {
         let eq = 0;
-        for (let r in reactdict) {
-            if (reactdict[r].base == "formula" && reactdict[r].name == this.getReactionType()) {
-                eq = reactdict[r].eq;
+        for (let r in reactDict) {
+            if (reactDict[r].base == "formula" && reactDict[r].name == this.getReactionType()) {
+                eq = reactDict[r].eq;
             }
         }
         return eq;
@@ -908,7 +908,7 @@ class formula {
         else if (chem.getDriver('bp') < conds[0]) {
             state = "g";
         }
-        if (reactdict[this.getReactDictR()].name === "combustion" && chem.formula === "H2O") {
+        if (reactDict[this.getReactDictR()].name === "combustion" && chem.formula === "H2O") {
             state = "g";
         }
         else if (parseInt(chem.getDriver('ion')) != 0) {
@@ -927,7 +927,7 @@ class formula {
     //Gets the reaction dictionary object
     getReactDictR() {
         let returnid = null;
-        for (let r in reactdict){
+        for (let r in reactDict){
             let contains = true;
             for (let c in this.reactants[0]) {
                 if (!r.includes(this.reactants[0][c].formula)) {

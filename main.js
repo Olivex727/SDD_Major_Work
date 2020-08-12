@@ -2,6 +2,9 @@
 
 console.log("BEGIN PROGRAM");
 
+//==========RETREIVE TEXT FILE INFO==========//
+
+//Jquery call to server,js, get files in public
 function getFiles(input, loc="files") {
     
     return $.ajax({
@@ -14,20 +17,20 @@ function getFiles(input, loc="files") {
 
 //Upload the element information
 let pt = getFiles("periodic_table");
+
 for (let e in pt) {
     let elm = pt[e].split(",");
     chemicaldict[elm[1].toString()] = parseFloat(elm[0]);
 }
 console.log(chemicaldict);
-console.log(chemicaldict["Zn"]);
 
-//Upload element driver information
-//formula|state|∆H|∆S|MP|BP|∆Vr
+//Upload element driver (chemical) information
 pt = getFiles("chemical_info");
+
 for (let e in pt) {
     if (e == 0) { continue; }
     let elm = pt[e].split("|");
-    driverdict[elm[0]] = {
+    chemDict[elm[0]] = {
         state : elm[1],
         enthalpy : parseFloat(elm[2]),
         entropy: parseFloat(elm[3]),
@@ -40,10 +43,9 @@ for (let e in pt) {
         displayInSearch: (elm[10] === "true")
     };
 }
-console.log(driverdict);
-console.log(driverdict["NaCl"].bp);
+console.log(chemDict);
 
-//Upload reaction information to reactdict
+//Upload reaction information to reactDict
 pt = getFiles("reactions");
 let idcount = 0;
 
@@ -52,7 +54,7 @@ for (let e in pt) {
         continue;
     }
     let elm = pt[e].split("|");
-    reactdict[elm[2]] = {
+    reactDict[elm[2]] = {
         base: elm[0],
         name: elm[1],
         products: elm[3],
@@ -62,13 +64,16 @@ for (let e in pt) {
     };
     idcount++
 }
+console.log(reactDict);
 
+//For any things that need to be performed onload
 window.onload = function () {
     
 }
 
-//=======COSMETICS=======//
+//=======COSMETICS/GUI=======//
 
+//Changes the colour of GUI elements when mouseover
 function changeButtonColor(obj, onobj = true, aquamarine = true) {
     let element = document.getElementById(obj.id);
     let color = "#477862";
@@ -78,6 +83,7 @@ function changeButtonColor(obj, onobj = true, aquamarine = true) {
     element.style.backgroundColor = color;
 }
 
+//Displays/Removes the search bar div
 function displaySearch(infocus){
     let searchdiv = document.getElementById('searchout');
     if (infocus) {
@@ -88,8 +94,6 @@ function displaySearch(infocus){
         searchdiv.style.display = 'none';
     }
 }
-
-//Note: Elements will only go as far as Uranium (No. 92) due to radioactivity and inability to properly bond
 
 /*
  * TYPES OF MOLECULES:
@@ -103,63 +107,29 @@ function displaySearch(infocus){
  * acid
  * base
  * metal
-*/
+ */
 
-salt3 = new chemical("NH4NO3", "Ammonium Nitrate", "salt", 0);
-salt2 = new chemical("Ca(NO3)2", "Calcium Nitrate", "salt", 0, "aq");
-ion1 = new chemical("NO3", "Nitrate ion", "ion", -1);
-ion2 = new chemical("PO4", "Phosphate ion", "ion", -3);
-omol = new chemical("CH4", "Methane", "omol", 0, "g");
-inmol2 = new chemical("O2", "Oxygen", "oxygen", 0, "g");
+//Note: Elements will only go as far as Uranium (No. 92) due to radioactivity and inability to properly bond
 
-/*
-console.log(salt2.getFormulaArray());
-console.log(salt1.getFormulaArray());
-console.log(ion2.getFormulaArray());
+//=======MAINLINE=======//
 
-console.log(salt1.getMolarMass());
-console.log(ion2.getMolarMass());
-*/
-
-//console.log(salt1.getDriver("enthalpy"));
-
-eq1 = new formula(false, [
-    [salt1, inmol1],
-    [1, 1],
-    [2, 1],
-    ["Kg", "mol"],
-    ["s", "l"]
-]);
-eq2 = new formula(false, [
-    [omol, inmol2],
-    [1, 1],
-    [1, 1],
-    ["mol", "mol"],
-    ["g", "g"]
-]);
-
+//Define mainEq, the output bar
+let mainEq = new formula();
 let output = document.getElementById("output");
 
-output.innerText = "\\(2H_{2}O\\ _{(g)}\\rightarrow2H_{2}\\ _{(g)}+O_{2}\\ _{(g)}\\)";
+output.innerText = "Loading ...";
 
-/*
-console.log(eq1.getId(false));
-console.log(eq1.getId(true));
-
-console.log(eq2.getId(false));
-console.log(eq2.getId(true));
-*/
-
+//Define mainEq, the output bar
 const condset = ["temp", "pressure" , "vol", "chem"];
 let auxcondset = []; let auxcounter = 0;
 let formulaOnStage = "";
 
 let oldConditionUnits = [[], []];
 
-output.innerText = displayReact(eq1, false);
+output.innerText = displayReact(mainEq, false);
 deleteButton();
 
-// ==== DRIVER ==== //
+//=======DRIVER=======//
 
 let driverText = getFiles("drivercheck", "driver");
 driverText.shift();
@@ -177,6 +147,7 @@ for (let c in driverText) {
 
 driver();
 
+//The driver module tests the reaction
 function driver() {
     let faults = [];
 
@@ -193,40 +164,45 @@ function driver() {
     //Check if the resulting formula object is as intended
     const checkValid = () => {
         let valid = true;
-        const id = eq1.getReactDictR();
+        const id = mainEq.getReactDictR();
 
-        for (let c in eq1.reactants[0]) {
-            if (eq1.reactants[1][c] != parseInt(driverInst[id].ratio[c])) {
+        for (let c in mainEq.reactants[0]) {
+            if (mainEq.reactants[1][c] != parseInt(driverInst[id].ratio[c])) {
                 valid = false;
             }
-            if (eq1.reactants[4][c] != driverInst[id].state[c]) {
+            if (mainEq.reactants[4][c] != driverInst[id].state[c]) {
                 valid = false;
             }
         }
-        for (let c in eq1.products[0]) {
+        for (let c in mainEq.products[0]) {
+            
             console.log(driverInst[id].ratio);
-            c = parseInt(c);
-            if (eq1.products[1][c] != parseInt(driverInst[id].ratio[c + eq1.reactants[0].length])) {
+            c = parseInt(c); //Very weird that JS makes this a string ...
+
+            if (mainEq.products[1][c] != parseInt(driverInst[id].ratio[c + mainEq.reactants[0].length])) {
                 valid = false;
             }
-            if (eq1.products[4][c] != driverInst[eq1.getId(true)].state[c + eq1.reactants[0].length]) {
-                console.log(eq1.products[0][c], driverInst[eq1.getId(true)].state[c + eq1.reactants[0].length], eq1.products[4][c]);
+            if (mainEq.products[4][c] != driverInst[mainEq.getId(true)].state[c + mainEq.reactants[0].length]) {
+                console.log(mainEq.products[0][c], driverInst[mainEq.getId(true)].state[c + mainEq.reactants[0].length], mainEq.products[4][c]);
                 valid = false;
             }
         }
 
-        return [valid, driverInst[id], reactdict[id], eq1];
+        return [valid, driverInst[id], reactDict[id], mainEq];
     }
 
     //Main subroutine loop
-    for (let c in reactdict) {
-        if (!reactdict[c].std) {
+    for (let c in reactDict) {
+        if (!reactDict[c].std && driverInst[c] != undefined) {
+
             autoReact(c.split('+'));
-            console.log("DRIVER: ", eq1);
+            console.log("DRIVER: ", mainEq);
             let check = checkValid();
+
             if (!check[0]) {
                 faults.push(check[1], check[2], check[3]);
             }
+
             deleteButton();
         }
     }
@@ -247,23 +223,8 @@ function driver() {
     
 }
 
-// ==== DRIVER ==== //
-
-/*AUTOMATIC OPERATION*/
-
-//displayResults(eq1.reactants, 'reactants');
-//reactButton();
-/*
-deleteButton();
-
-addChemicalToStage({id: "CH4"});
-addChemicalsToReaction();
-addChemicalToStage({id: "O2"});
-addChemicalsToReaction();
-reactButton();
-*/
-/*AUTOMATIC OPERATION*/
-
+//=======TESTING STAGE=======//
+//In this section, the intrinsic documentation will be incomplete
 
 //ts();
 
@@ -276,46 +237,27 @@ function ts() {
     output.innerText = "\\("+tscount+"\\)";
 }
 
-//IDEA --- RELOAD PAGE WHEN ACTIVIATING REACT FUNCTION!!
+//IDEA --- RELOAD PAGE WHEN ACTIVIATING REACT FUNCTION
 //setInterval(ts, 10000);
 
+//=======BUTTON ACTIVATIONS/GUI REACTION DISPLAY=======//
 
+//Displays the amounts/units of the reactants, products and excess in the lower 'auxillary' section of the page
 function displayResults(set, code) {
+
     console.log("DISPLAY RESULTS");
-    console.log(code);
     let results = document.getElementById('results_'+code);
     let element = document.getElementById('displayelement');
     const selectiontab = '" onchange="ChangeUnits(true);" value="mol"> <option value = "mol" > mol </option> <option value = "M" > M </option> <option value = "Kg" > Kg </option> <option value = "g" > g </option> <option value = "mg" > mg </option> <option value = "µg" > µg </option> </select> </li>'
 
     results.innerHTML = "<p>"+capitalize(code)+":</p>";
-
-    /*
-    let readOnlyString = "";
-    if (code === 'products' || code === 'excess') {
-        readOnlyString = " readonly=true";
-    }
-    */
-
     let deviation = [];
-    /*
-    let longest = 0;
-    for (let c in set[0]) {
-        if (set[0][c].name.length > longest) {
-            longest = set[0][c].name.length;
-        }
-    }
-    */
 
+    //Create a new list element in the results section
     for (let c in set[0]) {
         let e = element.cloneNode(true);
 
         e.id = "set_"+code+"_"+c;
-        /*
-        let spaces = "";
-        for (i = 0; i < longest - set[0][c].name.length; i++) { spaces += "_"; }
-        spaces += "_";
-        //console.log(spaces);
-        */
 
         e.innerHTML = '<li onclick="ConditionCheck(true)"> <span id ="chem_t_' + code + "_" + c +
         '">' + set[0][c].name + //'<span id="clear">' + spaces + '</span>' +
@@ -342,58 +284,67 @@ function displayResults(set, code) {
         document.getElementById("chem_u_" + code + "_" + c).style.left = (longest - deviation[c]).toString() + "px";
     }
 
+    //Alter the products/excess relative position from top
     let prod = document.getElementById('results_products');
-    prod.style.top = (- 50 - (31 * eq1.reactants[0].length)).toString() + "px";
+    prod.style.top = (- 50 - (31 * mainEq.reactants[0].length)).toString() + "px";
     console.log(prod.style.top);
 
     let addon = 0;
-    if (eq1.products[0].length > 0) {addon = -6;}
+    if (mainEq.products[0].length > 0) {addon = -6;}
     let excess = document.getElementById('results_excess');
-    excess.style.top = (addon-85 - (31 * (eq1.products[0].length + eq1.reactants[0].length))).toString() + "px";
+    excess.style.top = (addon-85 - (31 * (mainEq.products[0].length + mainEq.reactants[0].length))).toString() + "px";
     console.log("LOOOOOK" + excess.style.top);
 }
 
+//Activated when the 'React' button is pressed. This causes the reaction of mainEq, along with the display etc.
 function reactButton() {
-    for (let c in eq1.reactants[0]) {
-        eq1.reactants[2][c] = parseFloat(document.getElementById("chem_n_reactants_"+c).value);
-        eq1.reactants[3][c] = document.getElementById("chem_u_reactants_" + c).value;
+    //Add the reactants (Back up method)
+    for (let c in mainEq.reactants[0]) {
+        mainEq.reactants[2][c] = parseFloat(document.getElementById("chem_n_reactants_"+c).value);
+        mainEq.reactants[3][c] = document.getElementById("chem_u_reactants_" + c).value;
     }
-    console.log(eq1.reactants);
 
-    eq1.clear();
-    addConditions(eq1);
-    console.log(eq1.conditions);
+    //Remove Previous information and add Conditions
+    mainEq.clear();
+    addConditions(mainEq);
 
-    if (!eq1.react()) {
+    console.log("BEFORE: " + mainEq.conditions);
+
+    //React and display equation
+    if (!mainEq.react()) {
         alert("The reaction could not be calculated. Make sure your inputs are valid or to look up the set of valid reactions in the User Manual");
     }
     else {
-        output.innerText = displayReact(eq1, true);
+        output.innerText = displayReact(mainEq, true);
     }
-    displayResults(eq1.reactants, 'reactants');
-    displayResults(eq1.products, 'products');
-    displayResults(eq1.excess, 'excess');
 
-    for (let c in eq1.products[0]) {
-        document.getElementById("chem_n_products_" + c).value = eq1.products[2][c];
-        document.getElementById("chem_u_products_" + c).value = eq1.products[3][c];
+    console.log("AFTER: " + mainEq.conditions);
+
+    //Display auxillary results/calculations
+    displayResults(mainEq.reactants, 'reactants');
+    displayResults(mainEq.products, 'products');
+    displayResults(mainEq.excess, 'excess');
+
+    //Append excess/products so that the unit-changing works
+    for (let c in mainEq.products[0]) {
+        document.getElementById("chem_n_products_" + c).value = mainEq.products[2][c];
+        document.getElementById("chem_u_products_" + c).value = mainEq.products[3][c];
         auxcondset.push("products_" + c);
     }
-    for (let c in eq1.excess[0]) {
-        document.getElementById("chem_n_excess_" + c).value = eq1.excess[2][c];
-        document.getElementById("chem_u_excess_" + c).value = eq1.excess[3][c];
+    for (let c in mainEq.excess[0]) {
+        document.getElementById("chem_n_excess_" + c).value = mainEq.excess[2][c];
+        document.getElementById("chem_u_excess_" + c).value = mainEq.excess[3][c];
         auxcondset.push("excess_" + c);
     }
-    //console.log(auxcondset);
-    ConditionCheck(true);
 
-    console.log(eq1.reactants);
-    
+    //Update unit stores
+    ConditionCheck(true);
 }
 
+//Clear the reaction, auxillary and addstage
 function deleteButton() {
     //Clear reaction display
-    eq1 = new formula();
+    mainEq = new formula();
     output.style.color = "grey";
     output.innerText = "Enter Chemicals -->";
     auxcounter = 0;
@@ -402,9 +353,9 @@ function deleteButton() {
     formulaOnStage = "";
 
     //Update auxillary section
-    displayResults(eq1.reactants, 'reactants');
-    displayResults(eq1.products, 'products');
-    displayResults(eq1.excess, 'excess');
+    displayResults(mainEq.reactants, 'reactants');
+    displayResults(mainEq.products, 'products');
+    displayResults(mainEq.excess, 'excess');
 
     //Remove chemical from stage
     let textbox = document.getElementById("chem_n");
@@ -419,7 +370,6 @@ function deleteButton() {
 }
 
 function displayReact(equation, displayproducts) {
-    //let equation = new formula();
     output.style.color = "black";
 
     let display = "\\(";
@@ -516,7 +466,7 @@ function ConditionCheck(auxillary = false) {
 
 //Activated after the onchange event for all of the unit selections
 function ChangeUnits(auxillary = false) {
-    alert(oldConditionUnits[0]);
+    //alert(oldConditionUnits[0]);
     //alert(oldConditionUnits[0][1]);
     if (!auxillary) {
         for (let c in condset) {
@@ -538,17 +488,17 @@ function ChangeUnits(auxillary = false) {
     } else {
         for (let c in auxcondset) {
             if (document.getElementById("chem_u_" + auxcondset[c]).value !== oldConditionUnits[1][c]) {
-                addConditions(eq1);
+                addConditions(mainEq);
                 if (auxcondset[c].includes('reactants')){
-                    document.getElementById("chem_n_" + auxcondset[c]).value = round(eq1.convertUnits(eq1.reactants[0][c], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
+                    document.getElementById("chem_n_" + auxcondset[c]).value = round(mainEq.convertUnits(mainEq.reactants[0][c], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
                 }
                 else if (auxcondset[c].includes('products')) {
-                    let x = c - eq1.reactants[0].length;
-                    document.getElementById("chem_n_" + auxcondset[c]).value = round(eq1.convertUnits(eq1.products[0][x], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
+                    let x = c - mainEq.reactants[0].length;
+                    document.getElementById("chem_n_" + auxcondset[c]).value = round(mainEq.convertUnits(mainEq.products[0][x], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
                 }
                 else if (auxcondset[c].includes('excess')) {
-                    let x = c - eq1.reactants[0].length - eq1.products[0].length;
-                    document.getElementById("chem_n_" + auxcondset[c]).value = round(eq1.convertUnits(eq1.excess[0][x], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
+                    let x = c - mainEq.reactants[0].length - mainEq.products[0].length;
+                    document.getElementById("chem_n_" + auxcondset[c]).value = round(mainEq.convertUnits(mainEq.excess[0][x], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
                 }
             }
         }
@@ -623,8 +573,8 @@ function addConditions(equation) {
 function addChemicalsToReaction() {
     //Prevent Duplicates/Null inputs
     let sameflag = false;
-    for (let c in eq1.reactants[0]) {
-        if (eq1.reactants[0][c].formula === formulaOnStage) {
+    for (let c in mainEq.reactants[0]) {
+        if (mainEq.reactants[0][c].formula === formulaOnStage) {
             sameflag = true;
         }
     }
@@ -636,11 +586,11 @@ function addChemicalsToReaction() {
         alert("You can't double up on chemicals. Select a different chemical.");
         return null;
     }
-    if (eq1.reacted) {
+    if (mainEq.reacted) {
         alert("You need to clear the staged reaction first.");
         return null;
     }
-    if (eq1.reactants[0].length >= 2) {
+    if (mainEq.reactants[0].length >= 2) {
         alert("There is an upper limit of two reactants.");
         return null;
     }
@@ -655,13 +605,13 @@ function addChemicalsToReaction() {
     console.log(addition);
     
     //Input into reation object
-    addConditions(eq1);
-    eq1.reactants[0][auxcounter] = addition;
-    eq1.reactants[1][auxcounter] = 1;
-    eq1.reactants[2][auxcounter] =
-    eq1.convertUnits(addition, parseFloat(document.getElementById("chem_n").value), document.getElementById("chem_u").value, "mol");
-    eq1.reactants[3][auxcounter] = "mol";
-    eq1.reactants[4][auxcounter] = addition.state;
+    addConditions(mainEq);
+    mainEq.reactants[0][auxcounter] = addition;
+    mainEq.reactants[1][auxcounter] = 1;
+    mainEq.reactants[2][auxcounter] =
+    mainEq.convertUnits(addition, parseFloat(document.getElementById("chem_n").value), document.getElementById("chem_u").value, "mol");
+    mainEq.reactants[3][auxcounter] = "mol";
+    mainEq.reactants[4][auxcounter] = addition.state;
 
     
 
@@ -670,11 +620,11 @@ function addChemicalsToReaction() {
     auxcounter++;
     //console.log("lol", auxcondset);
 
-    console.log(eq1.reactants);
+    console.log(mainEq.reactants);
 
     //Update displayReact/output
-    displayResults(eq1.reactants, 'reactants');
-    output.innerText = displayReact(eq1, false);
+    displayResults(mainEq.reactants, 'reactants');
+    output.innerText = displayReact(mainEq, false);
     ConditionCheck(true);
 
     //Remove chemical from stage
@@ -698,9 +648,9 @@ function displaySearchResults() {
         
         console.log(string);
 
-        for (let c in driverdict) {
+        for (let c in chemDict) {
             //Get the likeness rank of both formula and name
-            search.push([rankString(string, c) + rankString(string, driverdict[c].name), c]);
+            search.push([rankString(string, c) + rankString(string, chemDict[c].name), c]);
         }
         
         //Sort the search array with highest score first
@@ -710,10 +660,10 @@ function displaySearchResults() {
         //Add search to name and formula
         for (let c in search) {
             if (
-                !(formula.includes(search[c][1]) || name.includes(driverdict[search[c][1]].name)) &&
-                search[c][0] != 0 && driverdict[search[c][1]].displayInSearch && c < 10
+                !(formula.includes(search[c][1]) || name.includes(chemDict[search[c][1]].name)) &&
+                search[c][0] != 0 && chemDict[search[c][1]].displayInSearch && c < 10
                 ) {
-                name.push(driverdict[search[c][1]].name);
+                name.push(chemDict[search[c][1]].name);
                 formula.push(search[c][1]);
             }
         }
