@@ -11,7 +11,7 @@
  * 
  */
 
-//Formula - MM
+//Define the basic dictionaries so that bad things don't happen
 let chemicaldict = {};
 let chemDict = {};
 let reactDict = {};
@@ -46,13 +46,13 @@ class chemical {
         let MM = 0;
         let farr = this.getFormulaArray();
         for (let chem in farr) {
-            //console.log(chemichaldict[farr[chem][0]]);
             MM += (chemicaldict[farr[chem][0]] * farr[chem][1]);
         }
         return MM;
     }
 
     //Seperate fromula into array of the elements and their amounts
+    //Example Outputs: "NaCl" => [["Na", 1], ["Cl", 1]]
     getFormulaArray() {
         //Split formula into array
         let farr = this.formula.split("");
@@ -133,9 +133,6 @@ class chemical {
     }
 }
 
-let salt1 = new chemical("(NH4)2SO3", "Ammonium Sulfate", "salt", 0, "s");
-let inmol1 = new chemical("H2O", "Water", "water", 0, "l");
-
 //Formula class is where all of the main reaction stuff is handled
 class formula {
     constructor(eq=false, reactants=[[], [], [], [], []], conditions=[[], []]) {
@@ -161,15 +158,17 @@ class formula {
          * 
         */
 
-        //Async in JS is annoying...
-
-        console.log(reactDict);
+        //Step 1
         let type = this.getReactionType();
         this.type = type;
         console.log(type);
+
+        //Step 2
         this.formulateProducts(type);
-        console.log(this.products);
+
+        //Step 3
         if (this.equalize()) {
+            //Step 4
             console.log(this.calculate());
             this.reacted = true;
             return true;
@@ -187,7 +186,6 @@ class formula {
                 let item = type[i];
                 for (let r in reactDict) {
                     if (reactDict[r].id == item) {
-                        //console.log(item);
                         //Once a formula is found, it will not matter if it's special or standard
                         type.splice(type.indexOf(item), 1)
                         if (!reactDict[r].std) {
@@ -197,7 +195,7 @@ class formula {
                             }
                             console.log(this.products);
                         }
-                        /*
+                        /* Standardised System -- Not in use
                         else {
                             //Implement standardized system
                             for (let c in reactDict[r].products.split("+")) {
@@ -235,18 +233,6 @@ class formula {
         * getEqualizerAmounts() -- Gets the amouns of elements on both sides
         * HCF() --Standard algoritim, finds HCF between an array of numbers
         * 
-        */
-
-        //STUB -- REMOVE ONCE GUI IS IMPLEMENTED
-        /*
-        this.reactants.push([]);
-        this.reactants.push([]);
-        this.reactants.push([]);
-        for (let c in this.reactants[0]) {
-            this.reactants[1][c] = 1;
-            this.reactants[2][c] = 0;
-            this.reactants[3][c] = "mol";
-        }
         */
 
         //Finds the smallest element amount in the set
@@ -336,6 +322,7 @@ class formula {
 
             console.log(condition1);
 
+            //Eliminate the chemicals that exist on both sides, i.e. H2O + _ -> _ + H2O
             if (indexes.length > 1) {
                 for (let r in this.reactants[0]) {
                     for (let p in this.products[0]) {
@@ -367,15 +354,14 @@ class formula {
 
             //The selection process for usable chemicals
             let useable = determineUsability(set, chem, ignore, ignoreset);
-            console.log("USEABLE: " + useable);
 
-            let min = 0;
+            //Define the smallest ratio chem value
+            let min = findChemInFormArr(this.multiplyRatioes(set[0][useable[0]].getFormulaArray(), 0, set), chem);
 
-            min = findChemInFormArr(this.multiplyRatioes(set[0][useable[0]].getFormulaArray(), 0, set), chem);
             let finalindex = -1;
             let indexlist = [];
-            console.log(this.multiplyRatioes(set[0][useable[0]].getFormulaArray(), 0, set));
 
+            //Determine the usability of the chemical
             for (let c in useable) {
                 let current = findChemInFormArr(this.multiplyRatioes(set[0][useable[c]].getFormulaArray(), 0, set), chem);
                 if (!isNaN(current) && current <= min && current > 0) {
@@ -400,10 +386,9 @@ class formula {
             }
         }
 
-        //Checks the reaction data for equalities via use of the HCF/GCD of the data
+        //Checks the reaction data for equalities via use of the HCF/GCD of the data -- No return
         let checkUsingHCF = () => {
 
-            console.log("CHECKHCF:");
             let equals = {}
 
             //Ignore all of the equal chemicals
@@ -417,7 +402,6 @@ class formula {
             }
 
             let newreacts = []; let newprods = [];
-            console.log(equals);
             let dummyreact = []; let dummyprod = [];
 
             //Append the non-equal chemicals to an array
@@ -490,7 +474,6 @@ class formula {
                     }
                 }
             }
-            //throw new Error("EXIT CODE");
         }
 
         let [reactnum, prodnum, equal] = this.getEqualizerAmts();
@@ -522,26 +505,28 @@ class formula {
                 ignore = element;
             }
 
+            //Divide both sides by HCF
             checkUsingHCF();
 
+            //Gets the amounts of elements on both sides to check if equal
             [reactnum, prodnum, equal] = this.getEqualizerAmts();
 
             iteration++;
             console.log("ITERATION: " + iteration);
 
-            //After 10000 recycles, it is clear that the reaction won't work and the program will not calculate
+            //After 1000 recycles, it is clear that the reaction won't work and the program will not calculate an answer
             if (iteration >= 1000) {
                 complete = false;
                 break;
             }
         }
 
-        console.log(equal);
         checkUsingHCF();
-        console.log(this.reactants, this.products);
         return complete;
     }
 
+    //Returns a list of dictionaries+booleans, determining the amounts of elements on each side
+    //i.e. {"Na":4}
     getEqualizerAmts(reacts=this.reactants, prods=this.products) {
         let reactnum = {};
         let prodnum = {}
@@ -553,11 +538,9 @@ class formula {
             newarr = this.multiplyRatioes(chem.getFormulaArray(), c, reacts);
             for(let e in newarr) {
                 if (newarr[e][0] in reactnum) {
-                    //console.log("found");
                     reactnum[newarr[e][0]] += newarr[e][1];
                 }
                 else {
-                    //console.log("none");
                     reactnum[newarr[e][0]] = newarr[e][1];
                 }
             }
@@ -569,10 +552,8 @@ class formula {
             newarr = this.multiplyRatioes(chem.getFormulaArray(), c, prods);
             for (let e in newarr) {
                 if (newarr[e][0] in prodnum) {
-                    //console.log("found");
                     prodnum[newarr[e][0]] += newarr[e][1];
                 } else {
-                    //console.log("none");
                     prodnum[newarr[e][0]] = newarr[e][1];
                 }
             }
@@ -581,15 +562,14 @@ class formula {
         //Check for equality
         let equal = true;
         for (let e in reactnum) {
-            //reactnum[e] = prodnum[e];
             if (reactnum[e] != prodnum[e]) {
-                //console.log('UNEQUAL');
                 equal = false;
             }
         }
         return [reactnum, prodnum, equal]
     }
 
+    //Multiplies the mole ratoes to a list
     multiplyRatioes(arr, index, set) {
         for (let c in arr) {
             arr[c][1] *= set[1][index];
@@ -601,7 +581,8 @@ class formula {
     getReactionType() {
         let type = [];
         for (let r in reactDict) {
-            //CHECK FOR WTF
+
+            /* Only neccesary for the formulateProducts() if general-case reactdicts are used
             if (reactDict[r].base === "name") {
                 let rsplit = r.split("+");
                 let checkreact = true;
@@ -614,7 +595,9 @@ class formula {
                     type.push(reactDict[r].id);
                 }
             }
-            
+            */
+
+            //Non-standard reactions
             if (reactDict[r].base === "formula") {
                 let rsplit = r.split("+");
                 let checkreact = true;
@@ -636,22 +619,9 @@ class formula {
     //Perform calculations on the reaction
     calculate() {
         console.log("Calculate");
+
+        //Prescision is pre-set
         let precision = 10;
-        //STUB -- REMOVE WHEN GUI IS IMPLEMENTED
-        /*
-        for (let n in this.reactants[2]) {
-            this.reactants[2][n] = round(25 /*Math.random()* 100 , precision, true);
-        }
-        */
-        //console.log(this.reactants[2]);
-
-        //this.reactants[3][0] = "g";
-
-        //this.products[3] = ["mol", "mol", "g"];
-
-        //Tempurature, Pressure, Volume of Water
-        //this.conditions = [[25, 100, 10], ["C", "KPa", "L"]];
-        //END STUB
 
         let newreact = [];
 
@@ -828,6 +798,7 @@ class formula {
         return eq;
     }
 
+    //Gets the id of the formula (not reactdict ID but string-reactants based id)
     getId(formula) {
         let id = "";
         if (formula){
@@ -849,6 +820,7 @@ class formula {
         return id;
     }
 
+    //Adds a chemical to products
     addToReact(formula, type = null, name = null) {
         this.products[0].push(new chemical(formula, name, type));
         this.products[1].push(1);
@@ -858,18 +830,22 @@ class formula {
     }
 
     //Gets and Returns the state of any chemicals in the reaction
+    //Lotta if statements to test each possibility -- no way aroud it
     getState(chem, react) {
         let conds = this.convertUnits(null, null, null, "K", true);
         let state = "";
 
+        //If all is null
         if (chem.getDriver("state") != null && chem.getDriver("state") !== "") {
             state = chem.getDriver("state");
         }
 
+        //Check if there is already a state
         if (react && chem.state != null) {
             state = chem.state;
         }
 
+        //Go through each combination of boiling point
         if (chem.getDriver('mp') == null || chem.getDriver('bp') == null) {
             state = null;
             let aqflag = false;
@@ -908,6 +884,8 @@ class formula {
         else if (chem.getDriver('bp') < conds[0]) {
             state = "g";
         }
+
+        //Special cases for combustion/ions
         if (reactDict[this.getReactDictR()].name === "combustion" && chem.formula === "H2O") {
             state = "g";
         }
@@ -915,9 +893,11 @@ class formula {
             chem.ion = parseInt(chem.getDriver('ion'));
             state = "aq";
         }
+
         return state;
     }
 
+    //Clears the reaction
     clear() {
         this.products = [[], [], [], [], []];
         this.conditions = [[], []];
@@ -945,56 +925,7 @@ class formula {
     }
 }
 
-//STANDARD FUNCTIONS
-
-//Get HCF between any two numbers (allows zero values as non-affectors)
-function HCF(nums=[1]) {
-    let factors = [];
-    let index = 0;
-
-    for (let c in nums) {
-        if (nums[c] == 0 && index == c) {
-            index++;
-        }
-        if (nums[c] > 0 && nums[c] < nums[index]) {
-            index = c;
-        }
-    }
-
-    for (let i = 1; i <= nums[index]; i++) {
-        let div = true;
-        for (let n in nums) {
-            if (nums[n] % i != 0) {
-                div = false;
-            }
-        }
-        if (div) { factors.push(i) }
-    }
-
-    return factors[factors.length-1];
-}
-
-//Get LCM between any two numbers
-function LCM(nums=[1]) {
-    let lcm = 1;
-    let products = [];
-
-    for (let n in nums) {
-        lcm *= nums[n];
-    }
-    for (let n in nums) {
-        products[n] = lcm/nums[n];
-    }
-
-    let newhcf = HCF(products);
-    lcm *= 1/newhcf;
-
-    for (let n in nums) {
-        products[n] *= 1 / newhcf;
-    }
-
-    return [products, lcm];
-}
+//STANDARD FUNCTIONS NOT IN STANDARDALGOS.JS -- SPECIFIC TO CLASSES
 
 //Converts a getFormulaArray() structure to dictionary
 function convertFormArrToDict(arr) {
@@ -1008,77 +939,4 @@ function convertFormArrToDict(arr) {
 //Finds a specific item in the getFormulaArray() structure
 function findChemInFormArr(arr, key) {
     return convertFormArrToDict(arr)[key];
-}
-
-//Rounds a number to a decimal place value or significant figure
-function round(num, prec, dp=false) {
-    if (dp) {
-        return Math.round(num * Math.pow(10, prec)) / Math.pow(10, prec);
-    }
-    else {
-        let numarr = num.toString().split('');
-        let newnum = [];
-        let sig = false;
-        let sigstart = 0;
-        let end = false;
-        let endindex = 0;
-        let isInteger = true;
-
-        for (let i = 0; i < numarr.length; i++) {
-
-            if (!end && !sig && numarr[i] !== "0" && numarr[i] !== ".") {
-                sig = true;
-                sigstart = i;
-            }
-
-            if (!end && sig) {
-                newnum.push(numarr[i]);
-            }
-            else if (numarr[i] === ".") {
-                newnum.push(".");
-                isInteger = false;
-            }
-            else {
-                newnum.push("0");
-            }
-
-            if (sig && i == prec + sigstart - 1) {
-                end = true;
-                endindex = i;
-            }
-        }
-
-        if (end) {
-            if (endindex >= numarr.length-1) {
-                if (isInteger) {
-                    newnum.push(".");
-                    numarr.push(".");
-                }
-                newnum.push("0");
-                numarr.push("0");
-            }
-            if (parseInt(numarr[endindex + 1]) >= 5 && newnum[endindex] !== "9") {
-                newnum[endindex] = (parseInt(numarr[endindex]) + 1).toString();
-            }
-            else if (parseInt(numarr[endindex + 1]) >= 5 && newnum[endindex] === "9") {
-                let x = 0
-                while (x < endindex && newnum[endindex - x] === "9") {
-                    x++;
-                    newnum[endindex - x + 1] = "0";
-                    if (newnum[endindex - x] !== ".") {
-                        newnum[endindex - x] = (parseInt(numarr[endindex - 1]) + 1).toString();
-                    }
-                    else if (newnum[endindex - x - 1] !== ".") {
-                        x++;
-                        newnum[endindex - x] = (parseInt(numarr[endindex - x]) + 1).toString();
-                    }
-                }
-                if (x == endindex) {
-                    newnum[0] = "10";
-                }
-            }
-        }
-
-        return parseFloat(newnum.join(''));
-    }
 }
