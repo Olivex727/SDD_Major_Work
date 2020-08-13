@@ -6,11 +6,12 @@
             - jquery
             - polyfill (unsure if necessary)
             - math-jax (latex text editor)
-            - Google Font (Work Sans)
+            - Google Font (Work Sans, Sanchez)
         -->
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
         <link href="https://fonts.googleapis.com/css2?family=Work+Sans&display=swap" rel="stylesheet"></link>
+        <link href="https://fonts.googleapis.com/css2?family=Josefin+Slab:ital@1&family=Sanchez:ital@1&display=swap" rel="stylesheet">
 
         <!--LaTex rendering doesn't work-->
         <span id="jax">
@@ -60,6 +61,8 @@
             }
 
             .intf #output {
+                font-family: 'Sanchez', serif;
+                font-size: large;
                 margin: 120px;
                 margin-top: 2px;
                 margin-bottom: 2px;
