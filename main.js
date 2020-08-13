@@ -62,7 +62,20 @@ for (let e in pt) {
         std: (elm[5] == "true"),
         id: idcount
     };
-    idcount++
+    idcount++;
+
+    //Add reverse reaction if eq is not 0
+    if (parseFloat(elm[4]) > 0) {
+        reactDict[elm[3]] = {
+            base: elm[0],
+            name: elm[1],
+            products: elm[2],
+            eq: parseFloat(elm[4]),
+            std: (elm[5] == "true"),
+            id: idcount
+        };
+        idcount++;
+    }
 }
 console.log(reactDict);
 
@@ -72,6 +85,20 @@ window.onload = function () {
 }
 
 //=======COSMETICS/GUI=======//
+
+let mouseOnSearchOut = false;
+
+//Checks if the mouse is still on the searchout div
+function searchMouseOver(mouseover = false) {
+    mouseOnSearchOut = mouseover;
+}
+
+//Called from onfocusout event -- Allows the onclick for the searchout box
+function searchFocusOut() {
+    if (!mouseOnSearchOut) {
+        displaySearch(false);
+    }
+}
 
 //Changes the colour of GUI elements when mouseover
 function changeButtonColor(obj, onobj = true, aquamarine = true) {
@@ -153,7 +180,6 @@ function driver() {
 
     //Automatically add chemicals and react
     const autoReact = (chems) => {
-        console.log(chems);
         for (let chem in chems) {
             addChemicalToStage({id: chems[chem]});
             addChemicalsToReaction();
@@ -183,10 +209,10 @@ function driver() {
                 valid = false;
             }
             if (mainEq.products[4][c] != driverInst[mainEq.getId(true)].state[c + mainEq.reactants[0].length]) {
-                console.log(mainEq.products[0][c], driverInst[mainEq.getId(true)].state[c + mainEq.reactants[0].length], mainEq.products[4][c]);
                 valid = false;
             }
         }
+        
 
         return [valid, driverInst[id], reactDict[id], mainEq];
     }
@@ -198,6 +224,7 @@ function driver() {
             autoReact(c.split('+'));
             console.log("DRIVER: ", mainEq);
             let check = checkValid();
+            console.log(check);
 
             if (!check[0]) {
                 faults.push(check[1], check[2], check[3]);
@@ -232,7 +259,7 @@ let tscount = 0;
 
 function ts() {
     //document.getElementById('jax').innerHTML = '<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">';
-    console.log("e");
+    //console.log("e");
     tscount++;
     output.innerText = "\\("+tscount+"\\)";
 }
@@ -245,7 +272,6 @@ function ts() {
 //Displays the amounts/units of the reactants, products and excess in the lower 'auxillary' section of the page
 function displayResults(set, code) {
 
-    console.log("DISPLAY RESULTS");
     let results = document.getElementById('results_'+code);
     let element = document.getElementById('displayelement');
     const selectiontab = '" onchange="ChangeUnits(true);" value="mol"> <option value = "mol" > mol </option> <option value = "M" > M </option> <option value = "Kg" > Kg </option> <option value = "g" > g </option> <option value = "mg" > mg </option> <option value = "µg" > µg </option> </select> </li>'
@@ -287,13 +313,11 @@ function displayResults(set, code) {
     //Alter the products/excess relative position from top
     let prod = document.getElementById('results_products');
     prod.style.top = (- 50 - (31 * mainEq.reactants[0].length)).toString() + "px";
-    console.log(prod.style.top);
 
     let addon = 0;
     if (mainEq.products[0].length > 0) {addon = -6;}
     let excess = document.getElementById('results_excess');
     excess.style.top = (addon-85 - (31 * (mainEq.products[0].length + mainEq.reactants[0].length))).toString() + "px";
-    console.log("LOOOOOK" + excess.style.top);
 }
 
 //Activated when the 'React' button is pressed. This causes the reaction of mainEq, along with the display etc.
@@ -304,11 +328,11 @@ function reactButton() {
         mainEq.reactants[3][c] = document.getElementById("chem_u_reactants_" + c).value;
     }
 
+    console.log(mainEq.reactants);
+
     //Remove Previous information and add Conditions
     mainEq.clear();
     addConditions(mainEq);
-
-    console.log("BEFORE: " + mainEq.conditions);
 
     //React and display equation
     if (!mainEq.react()) {
@@ -317,8 +341,6 @@ function reactButton() {
     else {
         output.innerText = displayReact(mainEq, true);
     }
-
-    console.log("AFTER: " + mainEq.conditions);
 
     //Display auxillary results/calculations
     displayResults(mainEq.reactants, 'reactants');
@@ -369,11 +391,13 @@ function deleteButton() {
     formulaOnStage = "";
 }
 
+//Displays the reaction onto the output div
 function displayReact(equation, displayproducts) {
     output.style.color = "black";
 
     let display = "\\(";
-    console.log(equation)
+    
+    //Forms the LaTeX output, FAULTY
     const formLaTex = (set) => {
         for (let n in set[0]) {
             let string = set[0][n].formula.split("");
@@ -385,10 +409,8 @@ function displayReact(equation, displayproducts) {
 
             let state = "";
             if (set[4][n] == null) {
-                console.log("URBICUE", set[0][n]);
                 state = equation.getState(set[0][n], true);
                 set[4][n] = state;
-                console.log("URBICUE", set[4][n]);
             }
             else {
                 state = set[4][n];
@@ -406,38 +428,42 @@ function displayReact(equation, displayproducts) {
             if (set[1][n] > 1) { ratio = set[1][n]; }
 
             display += ratio + string + "+";
-
-            //output.innerText = "\\("+string+"\\)";
-            //display += equation.reactants[0][c] + equation.reactants[0][c]
         }
     }
 
+    //Forms the reactants part of the output
     formLaTex(equation.reactants);
+
+    //Remove the + sign at the end of the display string
     display = display.split(""); display.pop(); display = display.join("");
+
+    //Display the products
     if (displayproducts){
         if (!equation.isDynamic) {
             display += "\\rightarrow ";
         } else {
             display += "\\leftrightharpoons ";
         }
-
         formLaTex(equation.products);
         display = display.split(""); display.pop(); display = display.join("");
     }
     display += "\\)";
+
     return display;
-    //console.log(display);
 }
+
+//=======CONDITION & UNIT MANAGEMENT=======//
 
 //Checks if the conditions are not negative, stores values in case of onchange event
 function ConditionCheck(auxillary = false) {
     let element_n = null; let element_u = null;
+
+    //For the non-auxillary conditions bar/add stage
     if (!auxillary) {
         for (let c in condset) {
             s = condset[c];
             element_n = document.getElementById(s + "_n");
             element_u = document.getElementById(s + "_u");
-            //console.log(element_n.value);
             if (parseFloat(element_n.value) <= 0) {
                 if (element_u.value != "C" || parseFloat(element_n.value) <= -273.15) {
                     element_n.value = 1;
@@ -446,12 +472,12 @@ function ConditionCheck(auxillary = false) {
             oldConditionUnits[0][c] = element_u.value;
         }
     }
+    //For the auxillary results stage
     else {
         for (let c in auxcondset) {
             s = auxcondset[c];
             element_n = document.getElementById("chem_n_" + s);
             element_u = document.getElementById("chem_u_" + s);
-            //console.log("URBICUE", element_n.value);
             if (parseFloat(element_n.value) <= 0) {
                 if (element_u.value != "C" || parseFloat(element_n.value) <= -273.15) {
                     element_n.value = 1;
@@ -460,18 +486,15 @@ function ConditionCheck(auxillary = false) {
             oldConditionUnits[1][c] = element_u.value;
         }
     }
-
-    console.log(oldConditionUnits[1]);
 }
 
-//Activated after the onchange event for all of the unit selections
+//Activated after the onchange event for all of the unit selections, changes the values based on units
+//This function should not operate for the addstage input box
 function ChangeUnits(auxillary = false) {
-    //alert(oldConditionUnits[0]);
-    //alert(oldConditionUnits[0][1]);
+    //For the non-auxillary conditions bar/add stage
     if (!auxillary) {
         for (let c in condset) {
             if (document.getElementById(condset[c] + "_u").value !== oldConditionUnits[0][c]) {
-                console.log(true);
                 if (
                     ((document.getElementById(condset[c] + "_u").value.includes('L') && oldConditionUnits[0][c].includes('L')) ||
                         (document.getElementById(condset[c] + "_u").value.includes('g') && oldConditionUnits[0][c].includes('g'))) ||
@@ -485,7 +508,9 @@ function ChangeUnits(auxillary = false) {
                 }
             }
         }
-    } else {
+    }
+    //For the auxillary results stage
+    else {
         for (let c in auxcondset) {
             if (document.getElementById("chem_u_" + auxcondset[c]).value !== oldConditionUnits[1][c]) {
                 addConditions(mainEq);
@@ -503,7 +528,6 @@ function ChangeUnits(auxillary = false) {
             }
         }
     }
-    console.log("lol", oldConditionUnits);
     
 }
 
@@ -512,7 +536,7 @@ function onlyConditionUnits(oldconds, newconds) {
     //Parameter: Array [Values, Units]
     newconds[0] = oldconds[0];
 
-    //===Change Units oldconds are in===//
+    //Change Units oldconds are in
     //Celsius
     if (oldconds[1].includes("C")) {
         newconds[0] = oldconds[0] + 273.15; //Ignore 273.14999999 ....
@@ -531,7 +555,7 @@ function onlyConditionUnits(oldconds, newconds) {
         newconds[0] = oldconds[0] * 101325;
     }
 
-    //Mass
+    //Mass/Capacity
     //Nothing, since the only conversions are from mg -> g -> Kg
 
     //Convert to basic units
@@ -559,9 +583,11 @@ function onlyConditionUnits(oldconds, newconds) {
     return newconds[0];
 }
 
+//=======ADD GUI DATA TO REACTION=======//
+
 //Adds all of the conditions to the reaction
 function addConditions(equation) {
-    equation.conditions[1] = ["C", "KPa", "L"]; //oldConditionUnits[0];
+    equation.conditions[1] = ["C", "KPa", "L"]; //oldConditionUnits[0]; Default
 
     for (let c in condset) {
         equation.conditions[0][c] = parseFloat(document.getElementById(condset[c] + "_n").value);
@@ -570,6 +596,7 @@ function addConditions(equation) {
     }
 }
 
+//Adds the chemicals in the add stage to the reaction bar/auxillary
 function addChemicalsToReaction() {
     //Prevent Duplicates/Null inputs
     let sameflag = false;
@@ -578,6 +605,8 @@ function addChemicalsToReaction() {
             sameflag = true;
         }
     }
+
+    //Output alerts to notify user
     if (formulaOnStage === "") {
         alert("You need to search and add a chemical to the stage.");
         return null;
@@ -601,8 +630,6 @@ function addChemicalsToReaction() {
     addition.type = addition.getDriver("type");
     addition.ion = addition.getDriver("ion");
     addition.state = addition.getDriver("state");
-
-    console.log(addition);
     
     //Input into reation object
     addConditions(mainEq);
@@ -611,16 +638,11 @@ function addChemicalsToReaction() {
     mainEq.reactants[2][auxcounter] =
     mainEq.convertUnits(addition, parseFloat(document.getElementById("chem_n").value), document.getElementById("chem_u").value, "mol");
     mainEq.reactants[3][auxcounter] = "mol";
-    mainEq.reactants[4][auxcounter] = addition.state;
-
-    
+    mainEq.reactants[4][auxcounter] = mainEq.getState(addition, true);
 
     //AuxillaryCondSet
     auxcondset.push("reactants_" + auxcounter);
     auxcounter++;
-    //console.log("lol", auxcondset);
-
-    console.log(mainEq.reactants);
 
     //Update displayReact/output
     displayResults(mainEq.reactants, 'reactants');
@@ -639,14 +661,15 @@ function addChemicalsToReaction() {
     formulaOnStage = "";
 }
 
+//=======SEARCH BAR=======//
+
+//Displays the search bar results
 function displaySearchResults() {
     //Algoritim to get most relevant to the search query
     const searchAlgoritim = (string) => {
         let name = [];
         let formula = [];
         let search = [];
-        
-        console.log(string);
 
         for (let c in chemDict) {
             //Get the likeness rank of both formula and name
@@ -702,7 +725,8 @@ function displaySearchResults() {
             longestchem = chemdeviation[c];
         }
     }
-    
+
+    //Adjusts the size of the search_out div to fit to text width
     for (let c in displayset[0]) {
         document.getElementById("search_formula_" + c).style.position = "relative";
         document.getElementById("search_formula_" + c).style.left = (longest - deviation[c] + 30).toString() + "px";
@@ -710,10 +734,14 @@ function displaySearchResults() {
     }
 }
 
+//Adds a chemical selected from the search bar to the stage
 function addChemicalToStage(element) {
     console.log("Added!");
+
+    //Get rid of search bar
     displaySearch(false);
 
+    //Add chemical to addStage
     let stagename = document.getElementById("chemicalonstage");
     stagename.innerHTML = "Current Chemical: " + element.id;
     stagename.style.color = "black";

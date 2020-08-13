@@ -1,32 +1,5 @@
-console.log("STANDARD ALGOS");
-
-let arr = []
-
-function fillArray(array, length) {
-    length--;
-    let randInt = 0;
-    let randIndex = 0;
-    for (let i = 0; i < length+1; i++) {
-        randInt = Math.round(Math.random() * length);
-        while (!isNaN(array[randIndex])){
-            randIndex = Math.round(Math.random() * length);
-        }
-        array[randIndex] = randInt;
-    }
-    return array;
-}
-
-//Testing stuff \/
-fillArray(arr, 10);
-shuffle(arr, 1000)
-console.log(arr);
-bubbleSort(arr);
-console.log("Insertion: ");
-console.log(arr);
-console.log(getMax(arr)[0]);
-console.log(getMin(arr)[0]);
-console.log(binarySearch(arr, 4));
-//Testing stuff /\
+//=======JUNK ALGORITHIMS=======//
+//Full of unused algoritims - May or may not work
 
 function shuffle(array, num) {
     for (var i = 0; i < num; i++) {
@@ -37,76 +10,6 @@ function shuffle(array, num) {
         array[b] = temp;
     }
     return array;
-}
-
-//Bubble sort an array of integer arrays or just integers -- integers will use no parameter
-function bubbleSort(array, index=-1) {
-    let swapped = true;
-    while (swapped) {
-        swapped = false;
-        let compare = 0;
-        while (compare < array.length-1) {
-            if (index >= 0 && array[compare][index] > array[compare + 1][index]) {
-                
-                let temp = array[compare];
-                array[compare] = array[compare + 1];
-                array[compare + 1] = temp;
-                swapped = true;
-            }
-            else if (index == -1 && array[compare] > array[compare + 1]) {
-                let temp = array[compare];
-                array[compare] = array[compare + 1];
-                array[compare + 1] = temp;
-                swapped = true;
-            }
-            compare++;
-        }
-    }
-    return array;
-}
-
-function selectionSort(array) {
-    let min = 0;
-    for (let i = 0; i < array.length; i++) {
-        min = getMin()[1];
-        temp = array[i];
-        array[i] = array[min];
-        array[min] = temp;
-    }
-    return array;
-}
-
-function insertionSort(array) {
-    for (let i = 1; i < array.length; i++) {
-        for (let comp = 0; comp < array.length; comp++) {
-            if (array[comp] >= array[i]) {
-                let temp = array[i];
-                if (i < comp) {
-                    for (let t = i + 1; t <= comp; t++) {
-                        array[t-1] = array[t];
-                    }
-                }
-                if (i > comp) {
-                    for (let t = i-1; t >= comp; t--) {
-                        array[t+1] = array[t];
-                    }
-                }
-                array[comp] = temp;
-            }
-        }
-    }
-    return array;
-}
-
-function linearSearch(array, num) {
-    let index = -1;
-    for (let i in array) {
-        if (array[i] == num) {
-            index = i;
-            break;
-        }
-    }
-    return index;
 }
 
 function binarySearch(array, num) {
@@ -155,7 +58,7 @@ function getMin(array) {
     return [min, index];
 }
 
-console.log(capitalize("lol"));
+//=======OTHER ALGORITHIMS=======//
 
 //Capitalises the first letter in a string
 function capitalize(string) {
@@ -173,9 +76,150 @@ function rankString(base, string) {
     if (string.toLowerCase().includes(base.toLowerCase())) {
         score = 100 * base.length / string.length;
     }
-    console.log(base, string);
     
     return score;
 }
 
-console.log("END STANDARD ALGOS");
+//Bubble sort an array of integer arrays or just integers -- integers will use no parameter
+function bubbleSort(array, index = -1) {
+    let swapped = true;
+    while (swapped) {
+        swapped = false;
+        let compare = 0;
+        while (compare < array.length - 1) {
+            if (index >= 0 && array[compare][index] > array[compare + 1][index]) {
+
+                let temp = array[compare];
+                array[compare] = array[compare + 1];
+                array[compare + 1] = temp;
+                swapped = true;
+            } else if (index == -1 && array[compare] > array[compare + 1]) {
+                let temp = array[compare];
+                array[compare] = array[compare + 1];
+                array[compare + 1] = temp;
+                swapped = true;
+            }
+            compare++;
+        }
+    }
+    return array;
+}
+
+//Get HCF between any two numbers (allows zero values as non-affectors)
+function HCF(nums = [1]) {
+    let factors = [];
+    let index = 0;
+
+    for (let c in nums) {
+        if (nums[c] == 0 && index == c) {
+            index++;
+        }
+        if (nums[c] > 0 && nums[c] < nums[index]) {
+            index = c;
+        }
+    }
+
+    for (let i = 1; i <= nums[index]; i++) {
+        let div = true;
+        for (let n in nums) {
+            if (nums[n] % i != 0) {
+                div = false;
+            }
+        }
+        if (div) {
+            factors.push(i)
+        }
+    }
+
+    return factors[factors.length - 1];
+}
+
+//Get LCM between any two numbers
+function LCM(nums = [1]) {
+    let lcm = 1;
+    let products = [];
+
+    for (let n in nums) {
+        lcm *= nums[n];
+    }
+    for (let n in nums) {
+        products[n] = lcm / nums[n];
+    }
+
+    let newhcf = HCF(products);
+    lcm *= 1 / newhcf;
+
+    for (let n in nums) {
+        products[n] *= 1 / newhcf;
+    }
+
+    return [products, lcm];
+}
+
+//Rounds a number to a decimal place value or significant figure
+function round(num, prec, dp = false) {
+    if (dp) {
+        return Math.round(num * Math.pow(10, prec)) / Math.pow(10, prec);
+    } else {
+        let numarr = num.toString().split('');
+        let newnum = [];
+        let sig = false;
+        let sigstart = 0;
+        let end = false;
+        let endindex = 0;
+        let isInteger = true;
+
+        for (let i = 0; i < numarr.length; i++) {
+
+            if (!end && !sig && numarr[i] !== "0" && numarr[i] !== ".") {
+                sig = true;
+                sigstart = i;
+            }
+
+            if (!end && sig) {
+                newnum.push(numarr[i]);
+            } else if (numarr[i] === ".") {
+                newnum.push(".");
+                isInteger = false;
+            } else {
+                newnum.push("0");
+            }
+
+            if (sig && i == prec + sigstart - 1) {
+                end = true;
+                endindex = i;
+            }
+        }
+
+        if (end) {
+            if (endindex >= numarr.length - 1) {
+                if (isInteger) {
+                    newnum.push(".");
+                    numarr.push(".");
+                }
+                newnum.push("0");
+                numarr.push("0");
+            }
+            if (parseInt(numarr[endindex + 1]) >= 5 && newnum[endindex] !== "9") {
+                newnum[endindex] = (parseInt(numarr[endindex]) + 1).toString();
+            } else if (parseInt(numarr[endindex + 1]) >= 5 && newnum[endindex] === "9") {
+                let x = 0
+                while (x < endindex && newnum[endindex - x] === "9") {
+                    x++;
+                    newnum[endindex - x + 1] = "0";
+                    if (newnum[endindex - x] !== ".") {
+                        newnum[endindex - x] = (parseInt(numarr[endindex - 1]) + 1).toString();
+                    } else if (newnum[endindex - x - 1] !== ".") {
+                        x++;
+                        newnum[endindex - x] = (parseInt(numarr[endindex - x]) + 1).toString();
+                    }
+                }
+                if (x == endindex) {
+                    newnum[0] = "10";
+                }
+            }
+        }
+
+        return parseFloat(newnum.join(''));
+    }
+}

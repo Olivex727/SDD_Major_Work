@@ -15,7 +15,7 @@
         </span>
         <link href="https://fonts.googleapis.com/css2?family=Work+Sans&display=swap" rel="stylesheet"></link>
         </script>
-        <!--<link rel="stylesheet" href="./sty.css">-->
+        <!--Style CSS - Connecting another file never works-->
         <style>
             #clear {
                 color: transparent;
@@ -197,9 +197,11 @@
         </style>
     </head>
     <body>
+        <!--Title-->
         <div class="titlediv">
         <h1 id="title">Reactit!</h1>
         </div>
+        <!--Condition/Reaction Interface-->
         <div class="intf">
             <div onclick="ConditionCheck()" class="conds">
                 <b>Conditions:</b>
@@ -232,12 +234,7 @@
                 <button id="react" onmouseleave="changeButtonColor(this, false)" onmouseover="changeButtonColor(this)" onclick="reactButton();"><b>React</b></button>
                 <button id="delete" onmouseleave="changeButtonColor(this, false)" onmouseover="changeButtonColor(this)" onclick="deleteButton();"><b>Clear</b></button>
             </div>
-            <!--
-            <p>
-                \( Cl^-_{(aq)} + Na^+_{(aq)} \leftrightharpoons NaCl_{(s)} \) Lol
-            </p>
-            -->
-            
+        <!--Addition stage (On GUI below search bar)-->
         </div>
         <div class="addstage" onclick="ConditionCheck()">
             <input type="number" id="chem_n" value="1"></input>
@@ -252,7 +249,7 @@
             <button id="Add" onclick="addChemicalsToReaction();"><b>Add</b></button>
             <span id="chemicalonstage">.</span>
         </div>
-        
+        <!--Auxillary Results display-->
         <div class="extra">
             <h3>Results</h3>
             <div class="chemdisplay" id="results_reactants">
@@ -283,17 +280,17 @@
                 </li>
             </div>
         </div>
-
+        <!--Search bar, here because it can't affect any other elements-->
         <div class="search" id="searchbar">
             <input id="search" type="text" placeholder="Search Chemicals..." onfocus="displaySearch(true);"
-                 onkeyup="displaySearchResults();"><!--onfocusout="displaySearch(false);"-->
-            <div id="searchout">
-                <!--\( CH_{3}COO_{(aq)}^{-}\)-->
+                 onkeyup="displaySearchResults();" onfocusout="searchFocusOut();">
+                 <!--onfocusout="displaySearch(false);"-->
+            <div id="searchout" onmouseover="searchMouseOver(true);" onmouseout="searchMouseOver(false);">
             </div>
-            <!--<li id="NaCl">Sodium Chloride <i>NaCl</i></li>-->
         </div>
     </body>
 
+    <!--Scripts for the JS stuff-->
     <script src="/algo"></script>
     <script src="/objjs"></script>
     <script src="/js"></script>
