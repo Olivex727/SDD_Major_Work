@@ -153,7 +153,6 @@ function driver() {
 
     //Automatically add chemicals and react
     const autoReact = (chems) => {
-        console.log(chems);
         for (let chem in chems) {
             addChemicalToStage({id: chems[chem]});
             addChemicalsToReaction();
@@ -183,10 +182,10 @@ function driver() {
                 valid = false;
             }
             if (mainEq.products[4][c] != driverInst[mainEq.getId(true)].state[c + mainEq.reactants[0].length]) {
-                console.log(mainEq.products[0][c], driverInst[mainEq.getId(true)].state[c + mainEq.reactants[0].length], mainEq.products[4][c]);
                 valid = false;
             }
         }
+        
 
         return [valid, driverInst[id], reactDict[id], mainEq];
     }
@@ -198,6 +197,7 @@ function driver() {
             autoReact(c.split('+'));
             console.log("DRIVER: ", mainEq);
             let check = checkValid();
+            console.log(check);
 
             if (!check[0]) {
                 faults.push(check[1], check[2], check[3]);
@@ -232,7 +232,7 @@ let tscount = 0;
 
 function ts() {
     //document.getElementById('jax').innerHTML = '<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">';
-    console.log("e");
+    //console.log("e");
     tscount++;
     output.innerText = "\\("+tscount+"\\)";
 }
@@ -301,11 +301,11 @@ function reactButton() {
         mainEq.reactants[3][c] = document.getElementById("chem_u_reactants_" + c).value;
     }
 
+    console.log(mainEq.reactants);
+
     //Remove Previous information and add Conditions
     mainEq.clear();
     addConditions(mainEq);
-
-    console.log("BEFORE: " + mainEq.conditions);
 
     //React and display equation
     if (!mainEq.react()) {
@@ -314,8 +314,6 @@ function reactButton() {
     else {
         output.innerText = displayReact(mainEq, true);
     }
-
-    console.log("AFTER: " + mainEq.conditions);
 
     //Display auxillary results/calculations
     displayResults(mainEq.reactants, 'reactants');
@@ -461,8 +459,6 @@ function ConditionCheck(auxillary = false) {
             oldConditionUnits[1][c] = element_u.value;
         }
     }
-
-    console.log(oldConditionUnits[1]);
 }
 
 //Activated after the onchange event for all of the unit selections, changes the values based on units
@@ -607,8 +603,6 @@ function addChemicalsToReaction() {
     addition.type = addition.getDriver("type");
     addition.ion = addition.getDriver("ion");
     addition.state = addition.getDriver("state");
-
-    console.log(addition);
     
     //Input into reation object
     addConditions(mainEq);
@@ -617,7 +611,7 @@ function addChemicalsToReaction() {
     mainEq.reactants[2][auxcounter] =
     mainEq.convertUnits(addition, parseFloat(document.getElementById("chem_n").value), document.getElementById("chem_u").value, "mol");
     mainEq.reactants[3][auxcounter] = "mol";
-    mainEq.reactants[4][auxcounter] = addition.state;
+    mainEq.reactants[4][auxcounter] = mainEq.getState(addition, true);
 
     //AuxillaryCondSet
     auxcondset.push("reactants_" + auxcounter);
@@ -649,8 +643,6 @@ function displaySearchResults() {
         let name = [];
         let formula = [];
         let search = [];
-        
-        console.log(string);
 
         for (let c in chemDict) {
             //Get the likeness rank of both formula and name

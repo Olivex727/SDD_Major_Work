@@ -1,7 +1,7 @@
 base|name|reactants|products|eq|standard
-formula|dissolution|H2O+NH4NO3|NH4+NO3+H2O|0|false
-formula|dissolution|H2O+(NH4)2SO3|NH4+SO3+H2O|0|false
-formula|dissolution|H2O+NaCl|Na+Cl+H2O|0|false
+formula|dissolution|NH4NO3|NH4+NO3|0|false
+formula|dissolution|(NH4)2SO3|NH4+SO3|0|false
+formula|dissolution|NaCl|Na+Cl|0|false
 formula|combustion|O2+CH4|CO2+H2O|0|false
 formula|combustion|O2+H2|H2O|0|false
 name|combustion|oxygen+omol|water+carbon dioxide+omol|0|true

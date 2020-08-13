@@ -24,8 +24,6 @@ class chemical {
 
     //Checks if the chemical is soluble in water
     isSoluble() {
-        console.log(this.formula);
-
         if(!this.formula === "H2O") { return true; }
         else { return false; }
     }
@@ -257,13 +255,11 @@ class formula {
         //Determines what chemicals can be ignored when finding how they can be manipulated
         let determineIgnoreSet = (reactnum, prodnum, element) => {
             let igset = [];
-            console.log(reactnum, prodnum);
             for (let c in reactnum) {
                 if (reactnum[c] == prodnum[c]) {
                     igset.push(c);
                 }
             }
-            console.log("IGSET:" + igset);
             return igset;
         }
     
@@ -319,8 +315,6 @@ class formula {
                     indexes.push(condition1[c]);
                 }
             }
-
-            console.log(condition1);
 
             //Eliminate the chemicals that exist on both sides, i.e. H2O + _ -> _ + H2O
             if (indexes.length > 1) {
@@ -395,7 +389,6 @@ class formula {
             for (let r in this.reactants[0]) {
                 for (let p in this.products[0]) {
                     if (this.reactants[0][r] === this.reactants[0][p] && this.reactants[1][r] == this.products[1][p]) {
-                        console.log(this.reactants[0][r]);
                         equals[this.reactants[0][r].formula] = [r, p];
                     }
                 }
@@ -489,7 +482,6 @@ class formula {
             let lowprod = prodnum[element];
 
             ignoreset = determineIgnoreSet(reactnum, prodnum, element);
-            console.log(element);
 
             //Determine the side that will be manipulated
             if (lowprod < lowreact) {
@@ -607,7 +599,6 @@ class formula {
                     }
                 }
                 if (checkreact) {
-                    console.log(reactDict[r]);
                     type.push(reactDict[r].id);
                 }
             }
@@ -855,6 +846,8 @@ class formula {
                 }
             }
             if (aqflag) {
+                //state = "aq";
+                //All salts are aqueous
                 if (chem.isSoluble()) {
                     state = "aq";
                 }
@@ -889,6 +882,9 @@ class formula {
         if (reactDict[this.getReactDictR()].name === "combustion" && chem.formula === "H2O") {
             state = "g";
         }
+        else if (reactDict[this.getReactDictR()].name === "dissolution") {
+            state = "aq";
+        }
         else if (parseInt(chem.getDriver('ion')) != 0) {
             chem.ion = parseInt(chem.getDriver('ion'));
             state = "aq";
@@ -920,7 +916,6 @@ class formula {
                 break;
             }
         }
-        console.log(returnid);
         return returnid;
     }
 }
