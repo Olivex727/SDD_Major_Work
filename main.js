@@ -145,7 +145,7 @@ function displaySearch(infocus){
 let mainEq = new formula();
 let output = document.getElementById("output");
 
-output.innerText = "Loading ...";
+output.innerHTML = "Loading ...";
 
 //Define mainEq, the output bar
 const condset = ["temp", "pressure" , "vol", "chem"];
@@ -154,7 +154,7 @@ let formulaOnStage = "";
 
 let oldConditionUnits = [[], []];
 
-output.innerText = displayReact(mainEq, false);
+output.innerHTML = displayReact(mainEq, false);
 deleteButton();
 
 //=======DRIVER=======//
@@ -255,10 +255,12 @@ function driver() {
 //In this section, the intrinsic documentation will be incomplete
 
 //ts();
-/*
+
+addChemicalToStage({id: "NaCl"});
+addChemicalsToReaction();
 addChemicalToStage({id: "H2O"});
 addChemicalsToReaction();
-*/
+reactButton();
 /*
 let tscount = 0;
 
@@ -268,7 +270,7 @@ function ts() {
     //document.getElementById('jax').removeChild(document.getElementById('MathJax-script'));
     //document.getElementById('jax').appendChild(document.getElementById('MathJax-script'));
     tscount++;
-    output.innerText = "\\("+tscount+"\\)";
+    output.innerHTML = "\\("+tscount+"\\)";
 }
 */
 
@@ -347,7 +349,7 @@ function reactButton() {
         alert("The reaction could not be calculated. Make sure your inputs are valid or to look up the set of valid reactions in the User Manual");
     }
     else {
-        output.innerText = displayReact(mainEq, true);
+        output.innerHTML = displayReact(mainEq, true);
     }
 
     //Display auxillary results/calculations
@@ -376,7 +378,7 @@ function deleteButton() {
     //Clear reaction display
     mainEq = new formula();
     output.style.color = "grey";
-    output.innerText = "Enter Chemicals -->";
+    output.innerHTML = "Enter Chemicals -->";
     auxcounter = 0;
     auxcondset = [];
     oldConditionUnits[1] = [];
@@ -402,7 +404,78 @@ function deleteButton() {
 //Displays the reaction onto the output div
 function displayReact(equation, displayproducts) {
     output.style.color = "black";
+    
+    let display = "H<sub>3</sub>O<sup>+</sup><sub>(aq)</sub>";
+    display = "";
+    
+    const formText = (set) => {
+        for (let n in set[0]) {
+            //Formula
+            let string = set[0][n].formula.split("");
+            for (let c in string) {
+                if (parseInt(string[c]).toString() != "NaN") {
+                    string[c] = "<sub>" + string[c] + "</sub>";
+                }
+            }
 
+            string = string.join("");
+
+            //Ion
+            let tempion = Math.abs(set[0][n].ion);
+            if (tempion == 1) {
+                tempion = "";
+            }
+
+            if (set[0][n].ion < 0) {
+                string += "<sup> -" + tempion + "</sup>";
+
+            } else if (set[0][n].ion > 0) {
+                string += "<sup> +" + tempion + "</sup>";
+            }
+            else {
+                string += " "
+            }
+
+            //State
+            let state = "";
+            if (set[4][n] == null) {
+                state = equation.getState(set[0][n], true);
+                set[4][n] = state;
+            } else {
+                state = set[4][n];
+            }
+
+            string += "<sub>(" + state + ")</sub> ";
+
+            //Mole Ratio
+            let ratio = "";
+            if (set[1][n] > 1) {
+                ratio = set[1][n];
+            }
+
+            display += ratio + string + "+ ";
+        }
+    }
+    //Forms the reactants part of the output
+    formText(equation.reactants);
+
+    //Remove the + sign at the end of the display string
+    display = display.split(""); display.pop(); display.pop(); display = display.join("");
+
+    //Display the products -- Requires Unicode charachters
+    if (displayproducts){
+        if (!equation.isDynamic) {
+            display += "&#8594 ";
+        } else {
+            display += "&#8652 ";
+        }
+        formText(equation.products);
+        display = display.split(""); display.pop(); display.pop(); display = display.join("");
+    }
+
+    return display;
+    
+    /*
     let display = "\\(";
     
     //Forms the LaTeX output, FAULTY
@@ -458,6 +531,7 @@ function displayReact(equation, displayproducts) {
     display += "\\)";
 
     return display;
+    */
 }
 
 //=======CONDITION & UNIT MANAGEMENT=======//
@@ -654,7 +728,7 @@ function addChemicalsToReaction() {
 
     //Update displayReact/output
     displayResults(mainEq.reactants, 'reactants');
-    output.innerText = displayReact(mainEq, false);
+    output.innerHTML = displayReact(mainEq, false);
     ConditionCheck(true);
 
     //Remove chemical from stage
@@ -698,8 +772,6 @@ function displaySearchResults() {
                 formula.push(search[c][1]);
             }
         }
-
-        console.log(search);
 
         return [name, formula]
     }
