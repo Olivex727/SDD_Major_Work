@@ -353,7 +353,6 @@ function reactButton() {
     }
 
     //Display auxillary results/calculations
-    displayResults(mainEq.reactants, 'reactants');
     displayResults(mainEq.products, 'products');
     displayResults(mainEq.excess, 'excess');
 
