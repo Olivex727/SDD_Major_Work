@@ -879,15 +879,17 @@ class formula {
         }
 
         //Special cases for combustion/ions
-        if (reactDict[this.getReactDictR()].name === "combustion" && chem.formula === "H2O") {
-            state = "g";
-        }
-        else if (reactDict[this.getReactDictR()].name === "dissolution") {
-            state = "aq";
-        }
-        else if (parseInt(chem.getDriver('ion')) != 0) {
-            chem.ion = parseInt(chem.getDriver('ion'));
-            state = "aq";
+        if (this.reacted || reactDict[this.getReactDictR()] != undefined) {
+            if (reactDict[this.getReactDictR()].name === "combustion" && chem.formula === "H2O") {
+                state = "g";
+            }
+            else if (reactDict[this.getReactDictR()].name === "dissolution") {
+                state = "aq";
+            }
+            else if (parseInt(chem.getDriver('ion')) != 0) {
+                chem.ion = parseInt(chem.getDriver('ion'));
+                state = "aq";
+            }
         }
 
         return state;

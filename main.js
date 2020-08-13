@@ -139,6 +139,7 @@ function displaySearch(infocus){
 //Note: Elements will only go as far as Uranium (No. 92) due to radioactivity and inability to properly bond
 
 //=======MAINLINE=======//
+//Occurs when main.js begins
 
 //Define mainEq, the output bar
 let mainEq = new formula();
@@ -172,7 +173,7 @@ for (let c in driverText) {
     }
 }
 
-driver();
+//driver();
 
 //The driver module tests the reaction
 function driver() {
@@ -254,18 +255,25 @@ function driver() {
 //In this section, the intrinsic documentation will be incomplete
 
 //ts();
-
+/*
+addChemicalToStage({id: "H2O"});
+addChemicalsToReaction();
+*/
+/*
 let tscount = 0;
 
 function ts() {
     //document.getElementById('jax').innerHTML = '<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">';
-    //console.log("e");
+    console.log("e");
+    //document.getElementById('jax').removeChild(document.getElementById('MathJax-script'));
+    //document.getElementById('jax').appendChild(document.getElementById('MathJax-script'));
     tscount++;
     output.innerText = "\\("+tscount+"\\)";
 }
+*/
 
 //IDEA --- RELOAD PAGE WHEN ACTIVIATING REACT FUNCTION
-//setInterval(ts, 10000);
+//setInterval(ts, 2000);
 
 //=======BUTTON ACTIVATIONS/GUI REACTION DISPLAY=======//
 
