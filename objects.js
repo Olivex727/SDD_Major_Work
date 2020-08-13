@@ -140,7 +140,6 @@ class formula {
         this.excess = [[], [], [], []] //Excess unreacted chemicals [chemical, amount, units]
 
         this.products = [[], [], [], [], []];
-        this.equilibrum = this.getEq();
         this.reacted = false;
     }
 
@@ -162,13 +161,17 @@ class formula {
         console.log(type);
 
         //Step 2
-        this.formulateProducts(type);
+        if (!this.formulateProducts(type)) {
+            return false;
+        }
+        console.log(this.products);
 
         //Step 3
         if (this.equalize()) {
             //Step 4
-            console.log(this.calculate());
             this.reacted = true;
+            console.log(this.calculate());
+            
             return true;
         }
         else {
@@ -180,8 +183,14 @@ class formula {
     formulateProducts(type) {
         if (!type.includes("none")) {
             for (let i in type) {
-                //Go through every item in the reaction, seach through reactDict, and add the products to the list
+                
                 let item = type[i];
+                //If the reaction type is a formula
+                if (parseInt(item).toString() === "NaN") {
+                    this.addToReact(item, null, chemDict[item].name);
+                }
+
+                //Go through every item in the reaction, seach through reactDict, and add the products to the list
                 for (let r in reactDict) {
                     if (reactDict[r].id == item) {
                         //Once a formula is found, it will not matter if it's special or standard
@@ -191,7 +200,6 @@ class formula {
                                 let name = chemDict[reactDict[r].products.split("+")[chem]].name;
                                 this.addToReact(reactDict[r].products.split("+")[chem], null, name);
                             }
-                            console.log(this.products);
                         }
                         /* Standardised System -- Not in use
                         else {
@@ -212,8 +220,10 @@ class formula {
                 }
             }
         } else {
-            this.products = this.reactants;
+            return false;
         }
+
+        return true;
     }
 
     //Equalise both sides of the reaction
@@ -572,6 +582,12 @@ class formula {
     //Determine the reaction type 
     getReactionType() {
         let type = [];
+        let reactantsList = [];
+
+        for (let r in this.reactants[0]) {
+            reactantsList[r] = this.reactants[0][r].formula;
+        }
+
         for (let r in reactDict) {
 
             /* Only neccesary for the formulateProducts() if general-case reactdicts are used
@@ -593,17 +609,44 @@ class formula {
             if (reactDict[r].base === "formula") {
                 let rsplit = r.split("+");
                 let checkreact = true;
+                let formulaStores = [];
+
+                //Check if each chemical matches
                 for (let c in rsplit) {
                     if (!this.getId(true).includes(rsplit[c])) {
                         checkreact = false;
                     }
+                    else {
+                        formulaStores.push(rsplit[c]);
+                    }
                 }
+
+                //Once it is found that it is a valid reaction
                 if (checkreact) {
-                    type.push(reactDict[r].id);
+                    type.push(reactDict[r].id.toString());
+
+                    //Remove reactants from list to prevent duplicates
+                    for (let i in formulaStores) {
+                        for (let c in reactantsList) {
+                            if (reactantsList[c] === formulaStores[i]) {
+                                reactantsList.splice(c, 1);
+                            }
+                        }
+                    }
                 }
             }
         }
-        if (type === []) { type.push("none"); }
+        
+        console.log(reactantsList[0]);
+        //Excess chemicals that aren't apart of any reaction are added as strings
+        for (let c in reactantsList) {
+            type.push(reactantsList[c]);
+        }
+
+        console.log(type);
+
+        //If else, add "none"
+        if (type.length == 0) { type.push("none"); }
         return type;
     }
 
@@ -778,17 +821,6 @@ class formula {
         return newval;
     }
 
-    //Get the Equilibrium constant for the reaction
-    getEq() {
-        let eq = 0;
-        for (let r in reactDict) {
-            if (reactDict[r].base == "formula" && reactDict[r].name == this.getReactionType()) {
-                eq = reactDict[r].eq;
-            }
-        }
-        return eq;
-    }
-
     //Gets the id of the formula (not reactdict ID but string-reactants based id)
     getId(formula) {
         let id = "";
@@ -813,7 +845,9 @@ class formula {
 
     //Adds a chemical to products
     addToReact(formula, type = null, name = null) {
-        this.products[0].push(new chemical(formula, name, type));
+        let chem = new chemical(formula, name, type);
+        chem.ion = chem.getDriver('ion');
+        this.products[0].push(chem);
         this.products[1].push(1);
         this.products[2].push(0);
         this.products[3].push("mol");
@@ -879,15 +913,17 @@ class formula {
         }
 
         //Special cases for combustion/ions
-        if (reactDict[this.getReactDictR()].name === "combustion" && chem.formula === "H2O") {
-            state = "g";
-        }
-        else if (reactDict[this.getReactDictR()].name === "dissolution") {
-            state = "aq";
-        }
-        else if (parseInt(chem.getDriver('ion')) != 0) {
-            chem.ion = parseInt(chem.getDriver('ion'));
-            state = "aq";
+        if (this.reacted || reactDict[this.getReactDictR()] != undefined) {
+            if (reactDict[this.getReactDictR()].name === "combustion" && chem.formula === "H2O") {
+                state = "g";
+            }
+            else if (reactDict[this.getReactDictR()].name === "dissolution") {
+                state = "aq";
+            }
+            else if (parseInt(chem.getDriver('ion')) != 0) {
+                chem.ion = parseInt(chem.getDriver('ion'));
+                state = "aq";
+            }
         }
 
         return state;
@@ -897,7 +933,6 @@ class formula {
     clear() {
         this.products = [[], [], [], [], []];
         this.conditions = [[], []];
-        this.equilibrum = this.getEq();
     }
 
     //Gets the reaction dictionary object
@@ -906,7 +941,7 @@ class formula {
         for (let r in reactDict){
             let contains = true;
             for (let c in this.reactants[0]) {
-                if (!r.includes(this.reactants[0][c].formula)) {
+                if (!r.includes(this.reactants[0][c].formula) && (this.reacted && !this.type.includes(this.reactants[0][c].formula))) {
                     contains = false;
                 }
             }

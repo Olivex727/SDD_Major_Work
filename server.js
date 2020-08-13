@@ -46,6 +46,23 @@ app.get('/file', function (req, res) {
     res.sendfile('public/' + req.query.loc + '/' + req.query.name + '.txt');
 });
 
+//TeX -- Doesn't work
+/*
+app.get('/tex', function (req, res) {
+    const page = fs.readFile("https://quicklatex.com/cache3/a9/ql_6f650bfe1215bf9cab5063a2515940a9_l3.png",
+    function (err, data) {
+        if (err) {throw err;}
+        else {
+            fs.writeFile("public/files/tex.png", data, 'binary', function (err2) {
+                if (err2) { throw err2; }
+                console.log('File saved.');
+            });
+        }
+    });
+    res.send(true);
+});
+*/
+
 //Host to port 8000
 app.listen(8000, function () {
     console.log('Listening on port 8000');
