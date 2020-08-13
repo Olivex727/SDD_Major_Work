@@ -62,7 +62,20 @@ for (let e in pt) {
         std: (elm[5] == "true"),
         id: idcount
     };
-    idcount++
+    idcount++;
+
+    //Add reverse reaction if eq is not 0
+    if (parseFloat(elm[4]) > 0) {
+        reactDict[elm[3]] = {
+            base: elm[0],
+            name: elm[1],
+            products: elm[2],
+            eq: parseFloat(elm[4]),
+            std: (elm[5] == "true"),
+            id: idcount
+        };
+        idcount++;
+    }
 }
 console.log(reactDict);
 

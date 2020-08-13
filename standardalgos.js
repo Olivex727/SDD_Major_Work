@@ -76,7 +76,6 @@ function rankString(base, string) {
     if (string.toLowerCase().includes(base.toLowerCase())) {
         score = 100 * base.length / string.length;
     }
-    console.log(base, string);
     
     return score;
 }
