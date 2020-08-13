@@ -86,6 +86,20 @@ window.onload = function () {
 
 //=======COSMETICS/GUI=======//
 
+let mouseOnSearchOut = false;
+
+//Checks if the mouse is still on the searchout div
+function searchMouseOver(mouseover = false) {
+    mouseOnSearchOut = mouseover;
+}
+
+//Called from onfocusout event -- Allows the onclick for the searchout box
+function searchFocusOut() {
+    if (!mouseOnSearchOut) {
+        displaySearch(false);
+    }
+}
+
 //Changes the colour of GUI elements when mouseover
 function changeButtonColor(obj, onobj = true, aquamarine = true) {
     let element = document.getElementById(obj.id);

@@ -283,8 +283,9 @@
         <!--Search bar, here because it can't affect any other elements-->
         <div class="search" id="searchbar">
             <input id="search" type="text" placeholder="Search Chemicals..." onfocus="displaySearch(true);"
-                 onkeyup="displaySearchResults();"><!--onfocusout="displaySearch(false);"-->
-            <div id="searchout">
+                 onkeyup="displaySearchResults();" onfocusout="searchFocusOut();">
+                 <!--onfocusout="displaySearch(false);"-->
+            <div id="searchout" onmouseover="searchMouseOver(true);" onmouseout="searchMouseOver(false);">
             </div>
         </div>
     </body>
