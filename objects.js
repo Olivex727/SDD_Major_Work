@@ -11,7 +11,7 @@
  * 
  */
 
-//Define the basic dictionaries so that bad things don't happen
+//Define the basic dictionaries
 let chemicaldict = {};
 let chemDict = {};
 let reactDict = {};

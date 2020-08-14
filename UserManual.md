@@ -4,6 +4,26 @@
 
 The Reactit! Calculator's goal is to provide an easier way of calculating basic chemical reactions for high school and university students. It will require prior knowledge to be able to operate, hence the target audience, however, it can help individual learning especially for those in Years 10 and 11. A majority of the reactions as well as the information accessible from the program will be geared towards New South Wales Preliminary/HSC Chemistry.
 
+## System Specs
+
+The solution does not require a high-level of program processing, hence the hardware requirements are minimal and most of the required specs involve the software.
+
+#### Software Requirements
+
+It is reccomended that you use Google Chrome for Mac OSX on the latest version (84.0.4147.125). However, it is possible to run the program in Safari, but certain aspects of the styling will not work as intended. The program will not work on Firefox.
+
+The program is for Mac OSX computers only. There is no guarantee that the program would work on Windows or Linux. The version of OSX does not matter as long as you can operate on the most recent version of chrome.
+
+In order to run the solution, access to the terminal and npm is required. It is also neccesary that the computer is capable of node.js server hosting. If your computer is operating a server the same port of 8000, the program may not be accesible.
+
+Before running the program, ensure that any other operating system features and Chrome browser extensions may not interfere with the program. Most of these additional features will not affect the efficiency of the program
+
+#### Hardware Requirements
+
+Due to the program being Mac OSX specific, it is likely that all possible computers are able to operate and host the solution. The only neccesary output/input equipment is a screen to display the window and a keyboard for searching/navigation using 'tab'. A mouse/trackpad is reccomended for the best navigation of the solution.
+
+It is reccomended that the computer uses the standard minimum processing requirements of a MacBook air (4 GB RAM, 1.6 GHZ i5 processor - an Early 2015 model MacBook air).
+
 ## Installation
 
 In order to install the software:
@@ -21,8 +41,6 @@ In order to install the software:
 **You can also drag and drop the folder icon (appearing at the top of the bar) on finder into the terminal of the file's location into terminal - this requires that the finder window be displaying the contents of the zip file.*
 
 ![filepath.png](./public/user_manual/Filepath.png)
-
-***
 
 ## Processes
 
