@@ -386,6 +386,9 @@ function reactButton() {
 
     //Update unit stores
     ConditionCheck(true);
+
+    //Prevent the user from changing the conditions
+
 }
 
 //Clear the reaction, auxillary and addstage
@@ -507,6 +510,12 @@ function ConditionCheck(auxillary = false) {
                 if (element_u.value != "C" || parseFloat(element_n.value) <= -273.15) {
                     element_n.value = 1;
                 }
+            }
+            if (mainEq.reacted) {
+                element_n.readOnly = true;]
+            }
+            else {
+                element_n.readOnly = false;
             }
             oldConditionUnits[0][c] = element_u.value;
         }

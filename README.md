@@ -3,6 +3,12 @@ Here is my Software Major Project - A chemical reaction simulator
 
 ## User Manual/Program Features
 
+### Primary Features
+
+The user can:
+1. Search and add chemicals to the reaction
+2. React simple chemical reaction based on the inputted reactions
+3. Perform unit conversions on the chemicals resulting from the reaction
 
 ### User Manual
 
