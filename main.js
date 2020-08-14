@@ -19,8 +19,8 @@ function getFiles(input, loc="files") {
 let pt = getFiles("periodic_table");
 
 for (let e in pt) {
-    let elm = pt[e].split(",");
-    chemicaldict[elm[1].toString()] = parseFloat(elm[0]);
+    let add = pt[e].split(",");
+    chemicaldict[add[1].toString()] = parseFloat(add[0]);
 }
 console.log(chemicaldict);
 
@@ -29,18 +29,18 @@ pt = getFiles("chemical_info");
 
 for (let e in pt) {
     if (e == 0) { continue; }
-    let elm = pt[e].split("|");
-    chemDict[elm[0]] = {
-        state : elm[1],
-        enthalpy : parseFloat(elm[2]),
-        entropy: parseFloat(elm[3]),
-        mp: parseFloat(elm[4]),
-        bp: parseFloat(elm[5]),
-        red_pot: parseFloat(elm[6]),
-        density: parseFloat(elm[7]),
-        ion: parseFloat(elm[8]),
-        name: elm[9],
-        displayInSearch: (elm[10] === "true")
+    let add = pt[e].split("|");
+    chemDict[add[0]] = {
+        state : add[1],
+        enthalpy : parseFloat(add[2]),
+        entropy: parseFloat(add[3]),
+        mp: parseFloat(add[4]),
+        bp: parseFloat(add[5]),
+        red_pot: parseFloat(add[6]),
+        density: parseFloat(add[7]),
+        ion: parseFloat(add[8]),
+        name: add[9],
+        displayInSearch: (add[10] === "true")
     };
 }
 console.log(chemDict);
@@ -53,25 +53,25 @@ for (let e in pt) {
     if (e == 0) {
         continue;
     }
-    let elm = pt[e].split("|");
-    reactDict[elm[2]] = {
-        base: elm[0],
-        name: elm[1],
-        products: elm[3],
-        eq: parseFloat(elm[4]),
-        std: (elm[5] == "true"),
+    let add = pt[e].split("|");
+    reactDict[add[2]] = {
+        base: add[0],
+        name: add[1],
+        products: add[3],
+        eq: parseFloat(add[4]),
+        std: (add[5] == "true"),
         id: idcount
     };
     idcount++;
 
     //Add reverse reaction if eq is not 0
-    if (parseFloat(elm[4]) > 0) {
-        reactDict[elm[3]] = {
-            base: elm[0],
-            name: elm[1],
-            products: elm[2],
-            eq: parseFloat(elm[4]),
-            std: (elm[5] == "true"),
+    if (parseFloat(add[4]) > 0) {
+        reactDict[add[3]] = {
+            base: add[0],
+            name: add[1],
+            products: add[2],
+            eq: parseFloat(add[4]),
+            std: (add[5] == "true"),
             id: idcount
         };
         idcount++;
@@ -85,6 +85,21 @@ window.onload = function () {
 }
 
 //=======COSMETICS/GUI=======//
+
+function help(close=false) {
+    if (!close) {
+        document.getElementById('not_help').style.display = "none";
+        document.getElementById('not_help').style.visibility = "hidden";
+        document.getElementById('help').style.display = "block";
+        document.getElementById('help').style.visibility = "visible";
+    }
+    if (close) {
+        document.getElementById('help').style.display = "none";
+        document.getElementById('help').style.visibility = "hidden";
+        document.getElementById('not_help').style.display = "inline";
+        document.getElementById('not_help').style.visibility = "visible";
+    }
+}
 
 let mouseOnSearchOut = false;
 
@@ -149,10 +164,10 @@ output.innerHTML = "Loading ...";
 
 //Define mainEq, the output bar
 const condset = ["temp", "pressure" , "vol", "chem"];
-let auxcondset = []; let auxcounter = 0;
+let auxcondset = []; let auxcounter = 0; //The auxillary units set
 let formulaOnStage = "";
 
-let oldConditionUnits = [[], []];
+let oldConditionUnits = [[], []]; //A store for the old units
 
 output.innerHTML = displayReact(mainEq, false);
 deleteButton();
@@ -172,8 +187,6 @@ for (let c in driverText) {
         state: add[2].split(',')
     }
 }
-
-//driver();
 
 //The driver module tests the reaction
 function driver() {
@@ -254,28 +267,15 @@ function driver() {
 //=======TESTING STAGE=======//
 //In this section, the intrinsic documentation will be incomplete
 
-//ts();
+//driver();
 
+/*
 addChemicalToStage({id: "NaCl"});
 addChemicalsToReaction();
 addChemicalToStage({id: "H2O"});
 addChemicalsToReaction();
 reactButton();
-/*
-let tscount = 0;
-
-function ts() {
-    //document.getElementById('jax').innerHTML = '<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">';
-    console.log("e");
-    //document.getElementById('jax').removeChild(document.getElementById('MathJax-script'));
-    //document.getElementById('jax').appendChild(document.getElementById('MathJax-script'));
-    tscount++;
-    output.innerHTML = "\\("+tscount+"\\)";
-}
 */
-
-//IDEA --- RELOAD PAGE WHEN ACTIVIATING REACT FUNCTION
-//setInterval(ts, 2000);
 
 //=======BUTTON ACTIVATIONS/GUI REACTION DISPLAY=======//
 
@@ -284,7 +284,12 @@ function displayResults(set, code) {
 
     let results = document.getElementById('results_'+code);
     let element = document.getElementById('displayelement');
-    const selectiontab = '" onchange="ChangeUnits(true);" value="mol"> <option value = "mol" > mol </option> <option value = "M" > M </option> <option value = "Kg" > Kg </option> <option value = "g" > g </option> <option value = "mg" > mg </option> <option value = "µg" > µg </option> </select> </li>'
+
+    //Define constants added to innerHTML
+    const selectiontab = '" onchange="ChangeUnits(true);" value="mol"> <option value = "mol" > mol </option> <option value = "Kg" > Kg </option> <option value = "g" > g </option> <option value = "mg" > mg </option> <option value = "µg" > µg </option>';
+    const captab = ' <option value = "KL" > KL </option> <option value = "L" > L </option> <option value = "mL" > mL </option>';
+    const Mtab = ' <option value = "M" > M </option>';
+    const endtab = ' </select> </li>';
 
     results.innerHTML = "<p>"+capitalize(code)+":</p>";
     let deviation = [];
@@ -295,11 +300,24 @@ function displayResults(set, code) {
 
         e.id = "set_"+code+"_"+c;
 
-        e.innerHTML = '<li onclick="ConditionCheck(true)"> <span id ="chem_t_' + code + "_" + c +
-        '">' + set[0][c].name + //'<span id="clear">' + spaces + '</span>' +
-        '</span>: <input type = "number" id = "chem_n_' + code + "_" + c +
-        '" value="' + set[2][c] + '" readonly=true> <select id = "chem_u_' + code + "_" + c
-        + selectiontab;
+        let primary = '<li onclick="ConditionCheck(true)"> <span id ="chem_t_' + code + "_" + c +
+            '">' + set[0][c].name + '</span>: <input type = "number" id = "chem_n_' + code + "_" + c +
+            '" value="' + set[2][c] + '" readonly=true> <select id = "chem_u_' + code + "_" + c +
+            selectiontab;
+
+
+        console.log(set, c);
+        //Add capaticty selectors for gasses
+        if (set[4][c] === "g" || set[0][c].state === "g") {
+            primary += captab;
+        }
+
+        //Add concentration selectors for aqueous elements
+        if (set[4][c] === "aq" || set[0][c].state === "aq") {
+            primary += Mtab;
+        }
+
+        e.innerHTML = primary + endtab;
 
         results.appendChild(e);
 
@@ -353,7 +371,6 @@ function reactButton() {
     }
 
     //Display auxillary results/calculations
-    displayResults(mainEq.reactants, 'reactants');
     displayResults(mainEq.products, 'products');
     displayResults(mainEq.excess, 'excess');
 
@@ -371,6 +388,9 @@ function reactButton() {
 
     //Update unit stores
     ConditionCheck(true);
+
+    //Prevent the user from changing the conditions
+
 }
 
 //Clear the reaction, auxillary and addstage
@@ -474,64 +494,6 @@ function displayReact(equation, displayproducts) {
     }
 
     return display;
-    
-    /*
-    let display = "\\(";
-    
-    //Forms the LaTeX output, FAULTY
-    const formLaTex = (set) => {
-        for (let n in set[0]) {
-            let string = set[0][n].formula.split("");
-            for (let c in string) {
-                if (parseInt(string[c]).toString() != "NaN") {
-                    string[c] = "_{" + string[c]+"}";
-                }
-            }
-
-            let state = "";
-            if (set[4][n] == null) {
-                state = equation.getState(set[0][n], true);
-                set[4][n] = state;
-            }
-            else {
-                state = set[4][n];
-            }
-
-            string = string.join("") + "\\ _{(" + state + ")}";
-
-            let tempion = Math.abs(set[0][n].ion);
-            if (tempion == 1){tempion = "";}
-
-            if (set[0][n].ion < 0) { string += "^{-" + tempion + "}"; }
-            else if (set[0][n].ion > 0) { string += "^{+" + tempion + "}"; }
-
-            let ratio = "";
-            if (set[1][n] > 1) { ratio = set[1][n]; }
-
-            display += ratio + string + "+";
-        }
-    }
-
-    //Forms the reactants part of the output
-    formLaTex(equation.reactants);
-
-    //Remove the + sign at the end of the display string
-    display = display.split(""); display.pop(); display = display.join("");
-
-    //Display the products
-    if (displayproducts){
-        if (!equation.isDynamic) {
-            display += "\\rightarrow ";
-        } else {
-            display += "\\leftrightharpoons ";
-        }
-        formLaTex(equation.products);
-        display = display.split(""); display.pop(); display = display.join("");
-    }
-    display += "\\)";
-
-    return display;
-    */
 }
 
 //=======CONDITION & UNIT MANAGEMENT=======//
@@ -550,6 +512,12 @@ function ConditionCheck(auxillary = false) {
                 if (element_u.value != "C" || parseFloat(element_n.value) <= -273.15) {
                     element_n.value = 1;
                 }
+            }
+            if (mainEq.reacted) {
+                element_n.readOnly = true;
+            }
+            else {
+                element_n.readOnly = false;
             }
             oldConditionUnits[0][c] = element_u.value;
         }
@@ -583,10 +551,10 @@ function ChangeUnits(auxillary = false) {
                     c != 3
                 ) {
                     document.getElementById(condset[c] + "_n").value =
-                        onlyConditionUnits(
+                        round(onlyConditionUnits(
                             [parseFloat(document.getElementById(condset[c] + "_n").value), oldConditionUnits[0][c]],
                             [1, document.getElementById(condset[c] + "_u").value]
-                        );
+                        ));
                 }
             }
         }
@@ -595,7 +563,7 @@ function ChangeUnits(auxillary = false) {
     else {
         for (let c in auxcondset) {
             if (document.getElementById("chem_u_" + auxcondset[c]).value !== oldConditionUnits[1][c]) {
-                addConditions(mainEq);
+                if(!mainEq.reacted) {addConditions(mainEq);}
                 if (auxcondset[c].includes('reactants')){
                     document.getElementById("chem_n_" + auxcondset[c]).value = round(mainEq.convertUnits(mainEq.reactants[0][c], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
                 }

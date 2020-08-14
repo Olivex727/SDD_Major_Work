@@ -1,5 +1,10 @@
 formula|state|∆H|∆S|MP|BP|∆Vr|Density|ion|name|displayInSearch
 NaCl|aq|-411.12|72|1073.8|1738|0|0|0|Sodium Chloride|true
+NH4NO3|aq|||||||0|Ammonium Nitrate|true
+(NH4)2SO3|aq|||||||0|Ammonium Sulfite|true
+NH4Cl|aq|||||||0|Ammonium Chloride|true
+Na2SO3|aq|||||||0|Sodium Sulfite|true
+NaNO3|aq|||||||0|Sodium Nitrate|true
 H2O|l|0|0|273.15|373.15|0|1|0|Water|true
 NO3||||||||-1|Nitrate Ion|true
 Na||||||||1|Sodium Ion|true
