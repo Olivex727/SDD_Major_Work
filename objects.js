@@ -759,6 +759,7 @@ class formula {
                 // PV = nRT
                 // n = PV/RT
                 newval = (val * newcons[1]) / (8.3145 * newcons[0]);
+                newval *= 1/1000; //Account for Pa -> KPa
             }
             else if (chem.getDriver("state") === "l") {
                 newval = (val * chem.getDriver("density") * 1000) / chem.getMolarMass();
@@ -780,6 +781,8 @@ class formula {
             newval *= 1 / 1000000;
         }
 
+        //console.log(val, newval);
+
         //===Convert out of moles===//
         //Units of amount
         if (newu.includes("mol")) {
@@ -792,19 +795,20 @@ class formula {
             
         }
         //Units of volume
-        else if (oldu.includes("L")) {
+        else if (newu.includes("L")) {
             // PV = nRT
             // V = nRT/P
             if (chem.getDriver("state") === "g") {
-                newval = (8.3145 * val * newcons[0]) / (newcons[1]);
+                newval = (8.3145 * newval * newcons[0]) / (newcons[1]);
+                newval *= 1000; //Account for Pa -> KPa
             } else if (chem.getDriver("state") === "l") {
-                newval = (val * chem.getMolarMass()) / (chem.getDriver("density") * 1000);
+                newval = (newval * chem.getMolarMass()) / (chem.getDriver("density") * 1000);
             }
             
         }
         //Units of Concentration
-        else if (oldu.includes("M")) {
-            newval = val / newcons[2];
+        else if (newu.includes("M")) {
+            newval = newval / newcons[2];
         }
 
         //Manage SI Units
@@ -917,7 +921,7 @@ class formula {
             if (reactDict[this.getReactDictR()].name === "combustion" && chem.formula === "H2O") {
                 state = "g";
             }
-            else if (reactDict[this.getReactDictR()].name === "dissolution") {
+            else if (this.getReactDictR().includes(chem.formula) && reactDict[this.getReactDictR()].name === "dissolution") {
                 state = "aq";
             }
             else if (parseInt(chem.getDriver('ion')) != 0) {

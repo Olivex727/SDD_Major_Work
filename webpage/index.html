@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-
+        <!--Icon.png https://www.pngitem.com/middle/imhxRmJ_test-tube-laboratory-icon-hd-png-download/ Retreived 14/8/2020-->
         <link rel="icon" type="image/png" href="/images_other/icon.png">
         <!--
             APIs:
@@ -219,16 +219,17 @@
             
         </style>
     </head>
-    <body>
+    <body onclick="ConditionCheck()">
         <div id="not_help">
         <!--Title-->
+        <!--Info.png https://www.iconfinder.com/icons/1396823/circle_info_information_letter_icon Retreived 14/8/2020-->
         <div class="titlediv">
         <h1 id="title">Reactit! <img src="/images_other/info.png" onclick="help();"> </h1>
         
         </div>
         <!--Condition/Reaction Interface-->
         <div class="intf">
-            <div onclick="ConditionCheck()" class="conds">
+            <div class="conds">
                 <b>Conditions:</b>
 
                 Tempurature: <input type="number" id="temp_n" value="298.15"></input>

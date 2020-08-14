@@ -299,7 +299,10 @@ function displayResults(set, code) {
 
     let results = document.getElementById('results_'+code);
     let element = document.getElementById('displayelement');
-    const selectiontab = '" onchange="ChangeUnits(true);" value="mol"> <option value = "mol" > mol </option> <option value = "M" > M </option> <option value = "Kg" > Kg </option> <option value = "g" > g </option> <option value = "mg" > mg </option> <option value = "µg" > µg </option> </select> </li>'
+    const selectiontab = '" onchange="ChangeUnits(true);" value="mol"> <option value = "mol" > mol </option> <option value = "Kg" > Kg </option> <option value = "g" > g </option> <option value = "mg" > mg </option> <option value = "µg" > µg </option>'
+    const captab = ' <option value = "KL" > KL </option> <option value = "L" > L </option> <option value = "mL" > mL </option>'
+    const Mtab = ' <option value = "M" > M </option>'
+    const endtab = ' </select> </li>'
 
     results.innerHTML = "<p>"+capitalize(code)+":</p>";
     let deviation = [];
@@ -310,11 +313,23 @@ function displayResults(set, code) {
 
         e.id = "set_"+code+"_"+c;
 
-        e.innerHTML = '<li onclick="ConditionCheck(true)"> <span id ="chem_t_' + code + "_" + c +
-        '">' + set[0][c].name + //'<span id="clear">' + spaces + '</span>' +
-        '</span>: <input type = "number" id = "chem_n_' + code + "_" + c +
-        '" value="' + set[2][c] + '" readonly=true> <select id = "chem_u_' + code + "_" + c
-        + selectiontab;
+        let primary = '<li onclick="ConditionCheck(true)"> <span id ="chem_t_' + code + "_" + c +
+            '">' + set[0][c].name + //'<span id="clear">' + spaces + '</span>' +
+            '</span>: <input type = "number" id = "chem_n_' + code + "_" + c +
+            '" value="' + set[2][c] + '" readonly=true> <select id = "chem_u_' + code + "_" + c +
+            selectiontab;
+
+        //Add capaticty selectors for gasses
+        if (set[4][c] === "g") {
+            primary += captab;
+        }
+
+        //Add concentration selectors for aqueous elements
+        if (set[4][c] === "aq") {
+            primary += Mtab;
+        }
+
+        e.innerHTML = primary + endtab;
 
         results.appendChild(e);
 
@@ -597,10 +612,10 @@ function ChangeUnits(auxillary = false) {
                     c != 3
                 ) {
                     document.getElementById(condset[c] + "_n").value =
-                        onlyConditionUnits(
+                        round(onlyConditionUnits(
                             [parseFloat(document.getElementById(condset[c] + "_n").value), oldConditionUnits[0][c]],
                             [1, document.getElementById(condset[c] + "_u").value]
-                        );
+                        ));
                 }
             }
         }
@@ -609,7 +624,7 @@ function ChangeUnits(auxillary = false) {
     else {
         for (let c in auxcondset) {
             if (document.getElementById("chem_u_" + auxcondset[c]).value !== oldConditionUnits[1][c]) {
-                addConditions(mainEq);
+                if(!mainEq.reacted) {addConditions(mainEq);}
                 if (auxcondset[c].includes('reactants')){
                     document.getElementById("chem_n_" + auxcondset[c]).value = round(mainEq.convertUnits(mainEq.reactants[0][c], parseFloat(document.getElementById("chem_n_" + auxcondset[c]).value), oldConditionUnits[1][c], document.getElementById("chem_u_" + auxcondset[c]).value), 10);
                 }
