@@ -305,13 +305,15 @@ function displayResults(set, code) {
             '" value="' + set[2][c] + '" readonly=true> <select id = "chem_u_' + code + "_" + c +
             selectiontab;
 
+
+        console.log(set, c);
         //Add capaticty selectors for gasses
-        if (set[4][c] === "g") {
+        if (set[4][c] === "g" || set[0][c].state === "g") {
             primary += captab;
         }
 
         //Add concentration selectors for aqueous elements
-        if (set[4][c] === "aq") {
+        if (set[4][c] === "aq" || set[0][c].state === "aq") {
             primary += Mtab;
         }
 
@@ -512,7 +514,7 @@ function ConditionCheck(auxillary = false) {
                 }
             }
             if (mainEq.reacted) {
-                element_n.readOnly = true;]
+                element_n.readOnly = true;
             }
             else {
                 element_n.readOnly = false;

@@ -137,7 +137,7 @@ class formula {
         this.reactants = reactants; //Array of 3-size arrays [chemical, Ratio, Amount, Units, State]
         this.conditions = conditions; //Tempurature, Pressure etc.
         this.isDynamic = eq; //Static or Dynamic
-        this.excess = [[], [], [], []] //Excess unreacted chemicals [chemical, amount, units]
+        this.excess = [[], [], [], [], []] //Excess unreacted chemicals [chemical, amount, units]
 
         this.products = [[], [], [], [], []];
         this.reacted = false;
@@ -692,6 +692,7 @@ class formula {
             this.excess[1][c] = ""; //Just a dummy set so that the display can show excess chemicals
             this.excess[2][c] = newreact[exchem[c]] - basicmol;
             this.excess[3][c] = "mol";
+            this.excess[4][c] = this.reactants[4][exchem[c]];
         }
 
         return this.reactants[0][limitreag];
