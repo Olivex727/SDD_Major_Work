@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
+
+        <link rel="icon" type="image/png" href="/images_other/icon.png">
         <!--
             APIs:
             - jquery
@@ -25,6 +27,12 @@
 
         <!--Style CSS - Connecting another file never works-->
         <style>
+
+            #help {
+                display: none;
+                visibility: hidden;
+            }
+
             #clear {
                 color: transparent;
             }
@@ -47,6 +55,11 @@
                 border-style: solid;
                 border-color: black;
                 border-width: 1px;
+            }
+
+            .titlediv img {
+                width: 20px;
+                height: 20px;
             }
 
             .intf {
@@ -207,9 +220,11 @@
         </style>
     </head>
     <body>
+        <div id="not_help">
         <!--Title-->
         <div class="titlediv">
-        <h1 id="title">Reactit!</h1>
+        <h1 id="title">Reactit! <img src="/images_other/info.png" onclick="help();"> </h1>
+        
         </div>
         <!--Condition/Reaction Interface-->
         <div class="intf">
@@ -298,6 +313,11 @@
             <div id="searchout" onmouseover="searchMouseOver(true);" onmouseout="searchMouseOver(false);">
             </div>
         </div>
+    </div>
+    <div id="help">
+        <button onclick="help(true);">X Close</button>
+        <img src="/user_manual/Main.png">
+    </div>
     </body>
 
     <!--Scripts for the JS stuff-->

@@ -86,6 +86,21 @@ window.onload = function () {
 
 //=======COSMETICS/GUI=======//
 
+function help(close=false) {
+    if (!close) {
+        document.getElementById('not_help').style.display = "none";
+        document.getElementById('not_help').style.visibility = "hidden";
+        document.getElementById('help').style.display = "block";
+        document.getElementById('help').style.visibility = "visible";
+    }
+    if (close) {
+        document.getElementById('help').style.display = "none";
+        document.getElementById('help').style.visibility = "hidden";
+        document.getElementById('not_help').style.display = "inline";
+        document.getElementById('not_help').style.visibility = "visible";
+    }
+}
+
 let mouseOnSearchOut = false;
 
 //Checks if the mouse is still on the searchout div
