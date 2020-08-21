@@ -45,7 +45,7 @@ function bubbleSort(array, index = -1) {
     return array;
 }
 
-//Get HCF between any two numbers (allows zero values as non-affectors)
+//Get Highest Common Factor of a set of given numbers (allows zero values as non-affectors)
 function HCF(nums = [1]) {
     let factors = [];
     let index = 0;
@@ -74,7 +74,7 @@ function HCF(nums = [1]) {
     return factors[factors.length - 1];
 }
 
-//Get LCM between any two numbers
+//Get Lowest Common Multiple of a set of given numbers
 function LCM(nums = [1]) {
     let lcm = 1;
     let products = [];
