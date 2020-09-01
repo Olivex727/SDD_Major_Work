@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Olivex727/SDD_Major_Work#readme",
   "dependencies": {
+    "express": "^4.17.1",
     "mathjax": "^3.0.5"
   }
 }
